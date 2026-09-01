@@ -1,59 +1,8 @@
 export type AiDestination = 'chatgpt' | 'gemini' | 'claude' | 'copilot' | 'other'
 export type ProgressPeriod = 'today' | '7days' | '30days' | 'all'
-
-export type AiSharePreferences = {
-  preferredDestination: AiDestination
-  period: ProgressPeriod
-  includeGoals: boolean
-  includeStreaks: boolean
-  includeDailyBreakdown: boolean
-  includeRecentActivities: boolean
-  includeCheckins: boolean
-  includeExactTimes: boolean
-}
-
-export const AI_DESTINATIONS: Array<{ id: AiDestination; label: string }> = [
-  { id: 'chatgpt', label: 'ChatGPT' },
-  { id: 'gemini', label: 'Gemini' },
-  { id: 'claude', label: 'Claude' },
-  { id: 'copilot', label: 'Copilot' },
-  { id: 'other', label: 'Other app / AI' },
-]
-
+export type AiSharePreferences = { preferredDestination: AiDestination; period: ProgressPeriod; includeGoals: boolean; includeStreaks: boolean; includeDailyBreakdown: boolean; includeRecentActivities: boolean; includeCheckins: boolean; includeGratitude: boolean; includeExactTimes: boolean }
+export const AI_DESTINATIONS: Array<{ id: AiDestination; label: string }> = [{ id: 'chatgpt', label: 'ChatGPT' }, { id: 'gemini', label: 'Gemini' }, { id: 'claude', label: 'Claude' }, { id: 'copilot', label: 'Copilot' }, { id: 'other', label: 'Other app / AI' }]
 const STORAGE_KEY = 'sharecapsule-health:ai-share-preferences'
-
-export const DEFAULT_AI_SHARE_PREFERENCES: AiSharePreferences = {
-  preferredDestination: 'chatgpt',
-  period: '7days',
-  includeGoals: true,
-  includeStreaks: true,
-  includeDailyBreakdown: true,
-  includeRecentActivities: true,
-  includeCheckins: false,
-  includeExactTimes: false,
-}
-
-export function readAiSharePreferences(): AiSharePreferences {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return DEFAULT_AI_SHARE_PREFERENCES
-    const parsed = JSON.parse(raw) as Partial<AiSharePreferences>
-    const destination = AI_DESTINATIONS.some((item) => item.id === parsed.preferredDestination) ? parsed.preferredDestination as AiDestination : DEFAULT_AI_SHARE_PREFERENCES.preferredDestination
-    const periods: ProgressPeriod[] = ['today', '7days', '30days', 'all']
-    const period = periods.includes(parsed.period as ProgressPeriod) ? parsed.period as ProgressPeriod : DEFAULT_AI_SHARE_PREFERENCES.period
-    return {
-      preferredDestination: destination,
-      period,
-      includeGoals: typeof parsed.includeGoals === 'boolean' ? parsed.includeGoals : true,
-      includeStreaks: typeof parsed.includeStreaks === 'boolean' ? parsed.includeStreaks : true,
-      includeDailyBreakdown: typeof parsed.includeDailyBreakdown === 'boolean' ? parsed.includeDailyBreakdown : true,
-      includeRecentActivities: typeof parsed.includeRecentActivities === 'boolean' ? parsed.includeRecentActivities : true,
-      includeCheckins: typeof parsed.includeCheckins === 'boolean' ? parsed.includeCheckins : false,
-      includeExactTimes: typeof parsed.includeExactTimes === 'boolean' ? parsed.includeExactTimes : false,
-    }
-  } catch {
-    return DEFAULT_AI_SHARE_PREFERENCES
-  }
-}
-
+export const DEFAULT_AI_SHARE_PREFERENCES: AiSharePreferences = { preferredDestination: 'chatgpt', period: '7days', includeGoals: true, includeStreaks: true, includeDailyBreakdown: true, includeRecentActivities: true, includeCheckins: false, includeGratitude: false, includeExactTimes: false }
+export function readAiSharePreferences(): AiSharePreferences { try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return DEFAULT_AI_SHARE_PREFERENCES; const parsed = JSON.parse(raw) as Partial<AiSharePreferences>; const destination = AI_DESTINATIONS.some((item) => item.id === parsed.preferredDestination) ? parsed.preferredDestination as AiDestination : DEFAULT_AI_SHARE_PREFERENCES.preferredDestination; const periods: ProgressPeriod[] = ['today', '7days', '30days', 'all']; const period = periods.includes(parsed.period as ProgressPeriod) ? parsed.period as ProgressPeriod : DEFAULT_AI_SHARE_PREFERENCES.period; return { preferredDestination: destination, period, includeGoals: typeof parsed.includeGoals === 'boolean' ? parsed.includeGoals : true, includeStreaks: typeof parsed.includeStreaks === 'boolean' ? parsed.includeStreaks : true, includeDailyBreakdown: typeof parsed.includeDailyBreakdown === 'boolean' ? parsed.includeDailyBreakdown : true, includeRecentActivities: typeof parsed.includeRecentActivities === 'boolean' ? parsed.includeRecentActivities : true, includeCheckins: typeof parsed.includeCheckins === 'boolean' ? parsed.includeCheckins : false, includeGratitude: typeof parsed.includeGratitude === 'boolean' ? parsed.includeGratitude : false, includeExactTimes: typeof parsed.includeExactTimes === 'boolean' ? parsed.includeExactTimes : false } } catch { return DEFAULT_AI_SHARE_PREFERENCES } }
 export function saveAiSharePreferences(preferences: AiSharePreferences) { localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences)); return preferences }

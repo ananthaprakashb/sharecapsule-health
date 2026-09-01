@@ -1,11 +1,14 @@
 # ShareCapsule Health
 
-ShareCapsule Health is a mobile-first, local-first wellness PWA for guided breathing, meditation, stretching, walking, eye breaks and daily routines.
+ShareCapsule Health is a mobile-first, local-first wellness PWA for guided breathing, meditation, stretching, walking, eye breaks, voice self-check-ins, gratitude expression and daily routines.
 
 ## PWA capabilities
 
 - Thirumoolar Pranayama 1:4:2 experience with its original UI and phase chime
 - meditation, stretch, walking and eye-rest timers
+- voice wellness check-ins with user-confirmed mood labels
+- `Thank Someone` gratitude practice with short voice messages, playback and device sharing
+- gratitude history stores metadata only; raw gratitude audio is not persisted by the app
 - favorites and preset/custom routines
 - configurable activity durations
 - daily goals, streaks and achievement badges
@@ -30,42 +33,39 @@ npm run typecheck
 npm run build
 ```
 
-Pull requests and pushes to `main` also run the GitHub Actions PWA CI build.
-
 ## Routes
-
-The PWA uses hash routing so static hosts do not require SPA rewrite rules.
 
 - `#/` — Today
 - `#/routines` — routines and local schedules
 - `#/progress` — progress and achievements
+- `#/check-in` — voice wellness check-in
 - `#/ai-sharing` — configure and share progress with a preferred AI/app
 - `#/settings` — settings, install and local-data controls
 - `#/privacy` — PWA privacy and data-use notice
 - `#/activity/thirumoolar` — Thirumoolar Breath
+- `#/activity/thank-someone` — gratitude voice-message practice
+
+## Gratitude practice
+
+`Thank Someone` is designed as a connection ritual rather than a competition feature: remember one specific act, record a short thank-you, listen back, then share it or keep the reflection private. The app tracks lightweight gratitude metadata and monthly counts, but deliberately avoids gratitude streaks and leaderboards. Audio remains in memory for playback/sharing and is not saved into history.
+
+Research on gratitude interventions suggests small improvements in well-being overall; evidence for direct physical-health effects is mixed. Product copy should therefore describe gratitude as a general wellness practice rather than treatment.
 
 ## AI / assistant sharing
 
-Progress sharing is provider-neutral and explicitly user initiated. Users select a preferred destination such as ChatGPT, Gemini, Claude, Copilot or another app, choose which progress fields to include, preview the generated update, and then use the operating system share sheet or copy text/JSON. The PWA does not store third-party AI API keys and does not automatically upload wellness history.
-
-The structured export uses `sharecapsule.health.progress.v1`. Future authenticated MCP/API integrations should consume the same user-approved contract so direct AI connectors do not require a different health-data model.
+Progress sharing is provider-neutral and explicitly user initiated. Confirmed check-ins and gratitude counts are separate opt-ins and default off. Gratitude recipient names and voice recordings are never included in the progress payload.
 
 ## Deployment requirements
 
-- Serve the production build over HTTPS.
-- The current manifest/service-worker paths assume deployment at the host root. If deploying under a repository subpath, update the Vite base and absolute asset paths first.
+- Serve the production build over HTTPS. Microphone features require a secure context.
+- The current manifest/service-worker paths assume deployment at the host root.
 - Ensure `/sw.js`, `/manifest.webmanifest`, `/icon-192.png`, `/icon-180.png` and `/app-icon.svg` are served without authentication.
-- Validate install, offline reopening, service-worker updates and notifications on the actual production origin.
-- Add the production canonical URL/sitemap only after the final domain is selected.
-
-## Reminder limitation
-
-PWA routine schedules are checked while the app is active and when it is reopened. Browser/system notifications are used when permission is available, but reliable delivery while the app is fully closed is not guaranteed without a push service or native scheduling.
+- Validate microphone permission, recording/playback, file sharing, install, offline reopening, updates and notifications on the production origin.
 
 ## Privacy
 
-The current PWA stores goals, favorites, routines, schedules, settings, AI-sharing preferences and activity history in browser local storage. It does not currently collect HealthKit, Health Connect or verified step data. Users can export, restore or clear ShareCapsule Health local data from Settings. AI/app sharing occurs only when the user explicitly shares, copies or downloads a selected progress summary.
+The current PWA stores goals, favorites, routines, schedules, settings, AI-sharing preferences, activity history, confirmed check-ins and gratitude metadata in browser local storage. It does not currently collect HealthKit, Health Connect or verified step data. Raw gratitude audio is not persisted by ShareCapsule Health.
 
 ## Safety
 
-ShareCapsule Health provides general wellness guidance and does not diagnose, treat, cure or prevent medical conditions. Activities should be practiced comfortably and stopped if they cause discomfort.
+ShareCapsule Health provides general wellness guidance and does not diagnose, treat, cure or prevent medical conditions.
