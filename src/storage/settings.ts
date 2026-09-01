@@ -3,6 +3,7 @@ const SETTINGS_KEY = 'sharecapsule-health:settings'
 export type HealthSettings = {
   guidanceChimes: boolean
   completionChime: boolean
+  reminderChime: boolean
   vibrationCues: boolean
   keepScreenAwake: boolean
 }
@@ -10,6 +11,7 @@ export type HealthSettings = {
 export const DEFAULT_SETTINGS: HealthSettings = {
   guidanceChimes: true,
   completionChime: true,
+  reminderChime: true,
   vibrationCues: true,
   keepScreenAwake: true,
 }
@@ -22,6 +24,7 @@ export function readSettings(): HealthSettings {
     return {
       guidanceChimes: typeof parsed.guidanceChimes === 'boolean' ? parsed.guidanceChimes : DEFAULT_SETTINGS.guidanceChimes,
       completionChime: typeof parsed.completionChime === 'boolean' ? parsed.completionChime : DEFAULT_SETTINGS.completionChime,
+      reminderChime: typeof parsed.reminderChime === 'boolean' ? parsed.reminderChime : DEFAULT_SETTINGS.reminderChime,
       vibrationCues: typeof parsed.vibrationCues === 'boolean' ? parsed.vibrationCues : DEFAULT_SETTINGS.vibrationCues,
       keepScreenAwake: typeof parsed.keepScreenAwake === 'boolean' ? parsed.keepScreenAwake : DEFAULT_SETTINGS.keepScreenAwake,
     }

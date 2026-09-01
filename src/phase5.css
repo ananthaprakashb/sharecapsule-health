@@ -1,0 +1,14 @@
+.phase5-data-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.phase5-data-actions button, .phase5-data-actions label, .phase5-link-button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 14px; border: 1px solid #d2cbb8; border-radius: 14px; background: #fffaf0; color: #17362f; font-weight: 800; cursor: pointer; }
+.phase5-data-actions label input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.phase5-data-actions .danger { border-color: #ddb8ad; color: #8d3428; background: #fff4f0; }
+.phase5-data-message { margin: 12px 0 0; color: #52685f; font-size: .86rem; }
+.phase5-link-button { margin-top: 10px; }
+.phase5-privacy-page { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+.phase5-error-page { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: #f5f2e8; color: #17362f; }
+.phase5-error-page section { width: min(100%, 560px); padding: 28px; border: 1px solid #ded7c4; border-radius: 28px; background: rgba(255,255,255,.82); box-shadow: 0 18px 44px rgba(39,56,47,.10); text-align: center; }
+.phase5-error-page section > span { display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 17px; background: #12392f; color: #f2c86e; font-size: 1.4rem; }
+.phase5-error-page h1 { font-size: clamp(1.8rem, 7vw, 2.8rem); }
+.phase5-error-page p:not(.eyebrow) { color: #68786f; line-height: 1.6; }
+.phase5-error-page section > div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+@media (max-width: 460px) { .phase5-error-page section > div { grid-template-columns: 1fr; } .phase5-data-actions > * { flex: 1 1 100%; } }

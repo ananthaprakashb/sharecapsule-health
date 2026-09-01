@@ -1,16 +1,18 @@
 # ShareCapsule Health
 
-ShareCapsule Health is a mobile-first wellness activity app. It starts with Thirumoolar Breath and is designed to expand into meditation, stretching, walking, posture, eye-break and daily routine activities.
+ShareCapsule Health is a mobile-first, local-first wellness PWA for guided breathing, meditation, stretching, walking, eye breaks and daily routines.
 
-## Phase 1
+## PWA capabilities
 
-- React + TypeScript + Vite app shell
-- Installable PWA manifest and service worker
-- Reusable `HealthActivity` domain model
-- Thirumoolar Breath 1:4:2 guided activity
-- Local-first completion history; no account required
-- Mobile-first, accessible UI
-- Foundation for future Capacitor iOS and Android packaging
+- Thirumoolar Pranayama 1:4:2 experience with its original UI and phase chime
+- meditation, stretch, walking and eye-rest timers
+- favorites and preset/custom routines
+- configurable activity durations
+- daily goals, streaks and achievement badges
+- local routine schedules and browser notifications
+- installable/offline-capable PWA with controlled updates
+- local data export, restore and reset controls
+- no account required for the PWA experience
 
 ## Development
 
@@ -26,17 +28,35 @@ npm run typecheck
 npm run build
 ```
 
+Pull requests and pushes to `main` also run the GitHub Actions PWA CI build.
+
 ## Routes
 
-The first release uses hash routing so it can deploy safely to static hosting without server rewrite configuration.
+The PWA uses hash routing so static hosts do not require SPA rewrite rules.
 
-- `#/` — Health home
-- `#/breathe/thirumoolar` — Thirumoolar Breath
+- `#/` — Today
+- `#/routines` — routines and local schedules
+- `#/progress` — progress and achievements
+- `#/settings` — settings, install and local-data controls
+- `#/privacy` — PWA privacy and data-use notice
+- `#/activity/thirumoolar` — Thirumoolar Breath
 
-## Privacy approach
+## Deployment requirements
 
-Phase 1 stores activity completion data only in the browser's local storage. No account or cloud health-data sync is required.
+- Serve the production build over HTTPS.
+- The current manifest/service-worker paths assume deployment at the host root. If deploying under a repository subpath, update the Vite base and absolute asset paths first.
+- Ensure `/sw.js`, `/manifest.webmanifest`, `/icon-192.png`, `/icon-180.png` and `/app-icon.svg` are served without authentication.
+- Validate install, offline reopening, service-worker updates and notifications on the actual production origin.
+- Add the production canonical URL/sitemap only after the final domain is selected.
+
+## Reminder limitation
+
+PWA routine schedules are checked while the app is active and when it is reopened. Browser/system notifications are used when permission is available, but reliable delivery while the app is fully closed is not guaranteed without a push service or native scheduling.
+
+## Privacy
+
+The current PWA stores goals, favorites, routines, schedules, settings and activity history in browser local storage. It does not currently collect HealthKit, Health Connect or verified step data. Users can export, restore or clear ShareCapsule Health local data from Settings.
 
 ## Safety
 
-ShareCapsule Health provides general wellness guidance and does not diagnose, treat, cure or prevent medical conditions. Breathing activities should be practiced comfortably without forcing breath retention.
+ShareCapsule Health provides general wellness guidance and does not diagnose, treat, cure or prevent medical conditions. Activities should be practiced comfortably and stopped if they cause discomfort.

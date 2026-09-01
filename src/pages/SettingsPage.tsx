@@ -1,19 +1,22 @@
 import { useState } from 'react'
+import type { ChangeEvent } from 'react'
 import { timedActivities } from '../activities/library'
 import { PwaInstallCard } from '../components/PwaInstallCard'
+import { clearLocalData, exportLocalData, restoreLocalData } from '../storage/dataPortability'
 import { getConfiguredDuration, readGoals, saveActivityDuration, saveGoals } from '../storage/engagement'
 import type { DailyGoals } from '../storage/engagement'
 import { readSettings, saveSettings } from '../storage/settings'
 import type { HealthSettings } from '../storage/settings'
 import { playCue, triggerHaptic, unlockCueAudio } from '../utils/cues'
 
-type SettingsPageProps = { onBack: () => void }
+type SettingsPageProps = { onBack: () => void; onOpenPrivacy: () => void }
 
-export function SettingsPage({ onBack }: SettingsPageProps) {
+export function SettingsPage({ onBack, onOpenPrivacy }: SettingsPageProps) {
   const [settings, setSettings] = useState(readSettings)
   const [goals, setGoals] = useState(readGoals)
   const [durations, setDurations] = useState<Record<string, number>>(() => Object.fromEntries(timedActivities.map((activity) => [activity.id, getConfiguredDuration(activity)])))
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>(() => 'Notification' in window ? Notification.permission : 'unsupported')
+  const [dataMessage, setDataMessage] = useState('')
 
   function updateSetting<K extends keyof HealthSettings>(key: K, value: HealthSettings[K]) {
     const next = { ...settings, [key]: value }
@@ -22,8 +25,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
   }
 
   function updateGoal<K extends keyof DailyGoals>(key: K, value: number) {
-    const next = saveGoals({ ...goals, [key]: value })
-    setGoals(next)
+    setGoals(saveGoals({ ...goals, [key]: value }))
   }
 
   function updateDuration(activityId: string, minutes: number) {
@@ -33,8 +35,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
 
   async function enableNotifications() {
     if (!('Notification' in window)) return
-    const permission = await Notification.requestPermission()
-    setNotificationPermission(permission)
+    setNotificationPermission(await Notification.requestPermission())
   }
 
   async function testCues() {
@@ -43,6 +44,47 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
       await playCue('transition')
     }
     if (settings.vibrationCues) triggerHaptic('transition')
+  }
+
+  async function testReminderChime() {
+    await unlockCueAudio()
+    await playCue('reminder')
+  }
+
+  function downloadBackup() {
+    const blob = new Blob([exportLocalData()], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `sharecapsule-health-backup-${new Date().toISOString().slice(0, 10)}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setDataMessage('Backup downloaded.')
+  }
+
+  async function restoreBackup(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    if (file.size > 1_000_000) {
+      setDataMessage('Backup file is too large.')
+      return
+    }
+
+    try {
+      const count = restoreLocalData(await file.text())
+      setDataMessage(`Restored ${count} local data entries. Reloading…`)
+      window.setTimeout(() => window.location.reload(), 500)
+    } catch (error) {
+      setDataMessage(error instanceof Error ? error.message : 'Unable to restore this backup.')
+    }
+  }
+
+  function resetLocalData() {
+    if (!window.confirm('Clear ShareCapsule Health goals, history, routines, schedules and settings from this browser?')) return
+    clearLocalData()
+    window.location.hash = '/'
+    window.location.reload()
   }
 
   return (
@@ -73,6 +115,8 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
         <p className="eyebrow">Reminders</p><h2>Browser notifications</h2>
         <p className="settings-intro">Routine schedules are managed under Routines. The PWA checks them while it is active or when reopened. Reliable closed-app delivery requires push or native scheduling later.</p>
         <div className="phase4-permission-row"><span><strong>Notification permission</strong><small>{notificationPermission === 'unsupported' ? 'Not supported in this browser' : notificationPermission}</small></span><button type="button" onClick={enableNotifications} disabled={notificationPermission === 'unsupported' || notificationPermission === 'granted'}>{notificationPermission === 'granted' ? 'Enabled' : 'Enable'}</button></div>
+        <label className="setting-row"><span><strong>In-app reminder chime</strong><small>Play a gentle two-tone cue when a due reminder appears while ShareCapsule Health is open. Browser audio rules may require prior interaction.</small></span><input type="checkbox" checked={settings.reminderChime} onChange={(event) => updateSetting('reminderChime', event.target.checked)} /></label>
+        <button className="settings-test-button" type="button" onClick={testReminderChime} disabled={!settings.reminderChime}>Test reminder chime</button>
       </section>
 
       <section className="settings-section">
@@ -86,7 +130,23 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
       </section>
 
       <section className="settings-section"><p className="eyebrow">Install</p><h2>Use it like an app</h2><PwaInstallCard /></section>
-      <section className="settings-section settings-privacy"><p className="eyebrow">Privacy</p><h2>Local-first by default</h2><p>Your goals, favorites, routines, schedules, settings and activity history stay in this browser. No account is required for the PWA wellness experience.</p></section>
+
+      <section className="settings-section phase5-data-controls">
+        <p className="eyebrow">Your data</p><h2>Backup & reset</h2>
+        <p className="settings-intro">These controls only affect ShareCapsule Health data stored in this browser.</p>
+        <div className="phase5-data-actions">
+          <button type="button" onClick={downloadBackup}>Download backup</button>
+          <label>Restore backup<input type="file" accept="application/json,.json" onChange={restoreBackup} /></label>
+          <button className="danger" type="button" onClick={resetLocalData}>Clear local data</button>
+        </div>
+        {dataMessage ? <p className="phase5-data-message" role="status">{dataMessage}</p> : null}
+      </section>
+
+      <section className="settings-section settings-privacy">
+        <p className="eyebrow">Privacy</p><h2>Local-first by default</h2>
+        <p>Your goals, favorites, routines, schedules, settings and activity history stay in this browser. No account is required for the PWA wellness experience.</p>
+        <button className="phase5-link-button" type="button" onClick={onOpenPrivacy}>Read privacy details</button>
+      </section>
     </main>
   )
 }
