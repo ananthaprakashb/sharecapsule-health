@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { APP_NAME, APP_SHORT_NAME } from '../brand'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -55,8 +56,8 @@ export function PwaInstallCard() {
       <aside className="pwa-install-card installed" aria-label="App installation status">
         <span aria-hidden="true">✓</span>
         <div>
-          <strong>Installed and offline-ready</strong>
-          <p>ShareCapsule Health can launch from your home screen.</p>
+          <strong>{APP_SHORT_NAME} is installed and offline-ready</strong>
+          <p>{APP_NAME} can launch from your home screen.</p>
         </div>
       </aside>
     )
@@ -67,7 +68,7 @@ export function PwaInstallCard() {
       <aside className="pwa-install-card">
         <span className="pwa-install-icon" aria-hidden="true">↧</span>
         <div>
-          <strong>Install ShareCapsule Health</strong>
+          <strong>Install {APP_NAME}</strong>
           <p>Use it like an app and keep core activities available offline.</p>
         </div>
         <button type="button" onClick={install}>Install</button>
@@ -80,7 +81,7 @@ export function PwaInstallCard() {
       <aside className="pwa-install-card">
         <span className="pwa-install-icon" aria-hidden="true">＋</span>
         <div>
-          <strong>Add to your Home Screen</strong>
+          <strong>Add {APP_SHORT_NAME} to your Home Screen</strong>
           <p>In Safari, tap Share, then choose Add to Home Screen.</p>
         </div>
       </aside>

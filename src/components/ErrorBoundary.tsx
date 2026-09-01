@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
+import { APP_NAME } from '../brand'
 
 type Props = { children: ReactNode }
 type State = { hasError: boolean }
@@ -12,7 +13,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('ShareCapsule Health render error', error, info)
+    console.error(`${APP_NAME} render error`, error, info)
   }
 
   private reload = () => window.location.reload()
@@ -32,7 +33,7 @@ export class ErrorBoundary extends Component<Props, State> {
       <main className="phase5-error-page">
         <section>
           <span aria-hidden="true">♥</span>
-          <p className="eyebrow">ShareCapsule Health</p>
+          <p className="eyebrow">{APP_NAME}</p>
           <h1>We couldn't open this screen.</h1>
           <p>Your local wellness history has not been cleared. Try reloading first; if the installed PWA has stale files, refresh only the app cache.</p>
           <div>

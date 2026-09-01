@@ -1,7 +1,11 @@
+import { APP_NAME, LEGACY_APP_NAME } from '../brand'
+
 const PREFIX = 'sharecapsule-health:'
 
+type SupportedBackupApp = typeof APP_NAME | typeof LEGACY_APP_NAME
+
 type HealthBackup = {
-  app: 'ShareCapsule Health'
+  app: SupportedBackupApp
   version: 1
   exportedAt: string
   entries: Record<string, string>
@@ -22,7 +26,7 @@ export function exportLocalData() {
   )
 
   const backup: HealthBackup = {
-    app: 'ShareCapsule Health',
+    app: APP_NAME,
     version: 1,
     exportedAt: new Date().toISOString(),
     entries,
@@ -33,14 +37,15 @@ export function exportLocalData() {
 
 export function restoreLocalData(raw: string) {
   const parsed = JSON.parse(raw) as Partial<HealthBackup>
-  if (parsed.app !== 'ShareCapsule Health' || parsed.version !== 1 || !parsed.entries || typeof parsed.entries !== 'object') {
-    throw new Error('This file is not a supported ShareCapsule Health backup.')
+  const supportedApp = parsed.app === APP_NAME || parsed.app === LEGACY_APP_NAME
+  if (!supportedApp || parsed.version !== 1 || !parsed.entries || typeof parsed.entries !== 'object') {
+    throw new Error(`This file is not a supported ${APP_NAME} backup.`)
   }
 
   const entries = Object.entries(parsed.entries).filter(
     ([key, value]) => key.startsWith(PREFIX) && typeof value === 'string',
   )
-  if (!entries.length) throw new Error('The backup does not contain ShareCapsule Health data.')
+  if (!entries.length) throw new Error(`The backup does not contain ${APP_NAME} data.`)
 
   clearLocalData()
   entries.forEach(([key, value]) => localStorage.setItem(key, value))

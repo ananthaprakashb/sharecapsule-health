@@ -1,3 +1,4 @@
+import { APP_NAME } from '../brand'
 import { useEffect, useState } from 'react'
 import { isScheduleDue, markScheduleNotified, readRoutineSchedules } from '../storage/engagement'
 import type { RoutineSchedule } from '../storage/engagement'
@@ -11,7 +12,7 @@ async function showSystemReminder(schedule: RoutineSchedule, silent = false) {
     const registration = await navigator.serviceWorker?.ready
     if (registration) {
       await registration.showNotification(`Time for ${schedule.title}`, {
-        body: 'Your scheduled ShareCapsule Health routine is ready.',
+        body: `Your scheduled ${APP_NAME} routine is ready.`,
         icon: '/icon-192.png',
         tag: `routine-${schedule.id}`,
         silent,
@@ -21,7 +22,7 @@ async function showSystemReminder(schedule: RoutineSchedule, silent = false) {
     }
 
     new Notification(`Time for ${schedule.title}`, {
-      body: 'Your scheduled ShareCapsule Health routine is ready.',
+      body: `Your scheduled ${APP_NAME} routine is ready.`,
       icon: '/icon-192.png',
       tag: `routine-${schedule.id}`,
       silent,

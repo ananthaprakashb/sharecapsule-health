@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getActivityById, getActivityBySlug } from './activities/library'
+import { APP_NAME } from './brand'
 import { AppChrome } from './components/AppChrome'
 import type { AppSection } from './components/AppChrome'
 import { AiSharingPage } from './pages/AiSharingPage'
@@ -24,7 +25,7 @@ export default function App() {
   const [route, setRoute] = useState<Route>(routeFromHash)
   const [activeRoutine, setActiveRoutine] = useState<ActiveRoutine | null>(null)
   useEffect(() => { const onHashChange = () => setRoute(routeFromHash()); window.addEventListener('hashchange', onHashChange); return () => window.removeEventListener('hashchange', onHashChange) }, [])
-  useEffect(() => { const pageTitle = route.page === 'activity' ? getActivityBySlug(route.slug)?.title ?? 'Health activity' : route.page === 'home' ? 'ShareCapsule Health' : route.page === 'ai-sharing' ? 'Share with AI · ShareCapsule Health' : route.page === 'check-in' ? 'Voice check-in · ShareCapsule Health' : `${route.page.charAt(0).toUpperCase()}${route.page.slice(1)} · ShareCapsule Health`; document.title = pageTitle }, [route])
+  useEffect(() => { const pageTitle = route.page === 'activity' ? `${getActivityBySlug(route.slug)?.title ?? 'Wellness activity'} · ${APP_NAME}` : route.page === 'home' ? APP_NAME : route.page === 'ai-sharing' ? `Share with AI · ${APP_NAME}` : route.page === 'check-in' ? `Voice check-in · ${APP_NAME}` : `${route.page.charAt(0).toUpperCase()}${route.page.slice(1)} · ${APP_NAME}`; document.title = pageTitle }, [route])
   function navigate(next: Route) { if (next.page === 'home') window.location.hash = '/'; if (next.page === 'routines') window.location.hash = '/routines'; if (next.page === 'progress') window.location.hash = '/progress'; if (next.page === 'settings') window.location.hash = '/settings'; if (next.page === 'privacy') window.location.hash = '/privacy'; if (next.page === 'ai-sharing') window.location.hash = '/ai-sharing'; if (next.page === 'check-in') window.location.hash = '/check-in'; if (next.page === 'activity') window.location.hash = `/activity/${next.slug}`; setRoute(next) }
   function navigateSection(page: AppSection) { navigate({ page }) }
   function openActivity(activity: HealthActivity) { setActiveRoutine(null); navigate({ page: 'activity', slug: activity.slug }) }

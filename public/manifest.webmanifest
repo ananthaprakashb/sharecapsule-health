@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "ShareCapsule Health",
-  "short_name": "SC Health",
-  "description": "Guided wellness activities for breathing, movement, mindfulness and daily routines.",
+  "name": "Vital by ShareCapsule",
+  "short_name": "Vital",
+  "description": "Guided wellness activities for breathing, movement, mindfulness, voice check-ins, gratitude and daily routines.",
   "lang": "en",
   "start_url": "/",
   "scope": "/",
