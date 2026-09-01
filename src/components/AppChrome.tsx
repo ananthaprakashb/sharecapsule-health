@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { ConnectivityBanner } from './ConnectivityBanner'
 import { PwaUpdateNotice } from './PwaUpdateNotice'
+import { ReminderMonitor } from './ReminderMonitor'
 
 export type AppSection = 'home' | 'routines' | 'progress' | 'settings'
 
@@ -22,6 +23,7 @@ export function AppChrome({ active, onNavigate, children }: AppChromeProps) {
     <div className="phase3-app">
       <ConnectivityBanner />
       <PwaUpdateNotice />
+      <ReminderMonitor />
       {children}
       <nav className="phase3-bottom-nav" aria-label="ShareCapsule Health navigation">
         {items.map((item) => (
