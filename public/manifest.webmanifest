@@ -1,0 +1,17 @@
+{
+  "name": "ShareCapsule Health",
+  "short_name": "SC Health",
+  "description": "Guided wellness activities for breathing, movement, mindfulness and daily routines.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f2e8",
+  "theme_color": "#12392f",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
