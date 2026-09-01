@@ -1,6 +1,12 @@
-# ShareCapsule Health
+# Vital by ShareCapsule
 
-ShareCapsule Health is a mobile-first, local-first wellness PWA for guided breathing, meditation, stretching, walking, eye breaks, voice self-check-ins, gratitude expression and daily routines.
+**Vital by ShareCapsule** is a mobile-first, local-first wellness PWA for guided breathing, meditation, stretching, walking, eye breaks, voice self-check-ins, gratitude expression and daily routines.
+
+**Tagline:** Small habits. Better well-being.
+
+Production URL: `https://health.sharecapsule.org/`
+
+The GitHub repository name remains `sharecapsule-health` for continuity.
 
 ## PWA capabilities
 
@@ -55,6 +61,8 @@ Research on gratitude interventions suggests small improvements in well-being ov
 
 Progress sharing is provider-neutral and explicitly user initiated. Confirmed check-ins and gratitude counts are separate opt-ins and default off. Gratitude recipient names and voice recordings are never included in the progress payload.
 
+The public product name is `Vital by ShareCapsule`, while the progress contract remains `sharecapsule.health.progress.v1` for compatibility with existing and future integrations.
+
 ## Deployment requirements
 
 - Serve the production build over HTTPS. Microphone features require a secure context.
@@ -62,10 +70,21 @@ Progress sharing is provider-neutral and explicitly user initiated. Confirmed ch
 - Ensure `/sw.js`, `/manifest.webmanifest`, `/icon-192.png`, `/icon-180.png` and `/app-icon.svg` are served without authentication.
 - Validate microphone permission, recording/playback, file sharing, install, offline reopening, updates and notifications on the production origin.
 
+## Rebrand compatibility
+
+Existing users keep their data through the rename from ShareCapsule Health to Vital by ShareCapsule:
+
+- localStorage keys intentionally remain under the `sharecapsule-health:` prefix
+- service-worker cache prefixes remain unchanged
+- the `sharecapsule.health.progress.v1` contract remains unchanged
+- new backups use `Vital by ShareCapsule`, while restore continues to accept legacy `ShareCapsule Health` version-1 backups
+
+Do not rename those compatibility identifiers without a migration plan.
+
 ## Privacy
 
-The current PWA stores goals, favorites, routines, schedules, settings, AI-sharing preferences, activity history, confirmed check-ins and gratitude metadata in browser local storage. It does not currently collect HealthKit, Health Connect or verified step data. Raw gratitude audio is not persisted by ShareCapsule Health.
+The current PWA stores goals, favorites, routines, schedules, settings, AI-sharing preferences, activity history, confirmed check-ins and gratitude metadata in browser local storage. It does not currently collect HealthKit, Health Connect or verified step data. Raw gratitude audio is not persisted by Vital by ShareCapsule.
 
 ## Safety
 
-ShareCapsule Health provides general wellness guidance and does not diagnose, treat, cure or prevent medical conditions.
+Vital by ShareCapsule provides general wellness guidance and does not diagnose, treat, cure or prevent medical conditions.

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { APP_NAME } from '../brand'
 import { CHECKIN_MOODS, getMoodLabel, readCheckins, saveCheckin, suggestMoodFromSelfReport } from '../storage/checkins'
 import type { CheckinMood } from '../storage/checkins'
 
@@ -111,7 +112,7 @@ export function VoiceCheckinPage({ onBack }: VoiceCheckinPageProps) {
     setSelectedMood(null)
     setSaveWords(false)
     usedVoiceRef.current = false
-    setStatus('Check-in saved locally. ShareCapsule Health did not save raw audio.')
+    setStatus(`Check-in saved locally. ${APP_NAME} did not save raw audio.`)
   }
 
   return (
@@ -133,7 +134,7 @@ export function VoiceCheckinPage({ onBack }: VoiceCheckinPageProps) {
 
       <section className="settings-section">
         <p className="eyebrow">Your words</p><h2>Review what you said</h2>
-        <p className="settings-intro">Speech recognition is provided by your browser/device. ShareCapsule Health does not store the raw microphone audio.</p>
+        <p className="settings-intro">Speech recognition is provided by your browser/device. {APP_NAME} does not store the raw microphone audio.</p>
         <textarea className="phase7-transcript" rows={4} value={transcript} placeholder="Your spoken answer appears here, or type how you feel…" onChange={(event) => { usedVoiceRef.current = false; updateTranscript(event.target.value) }} />
         {suggestedMood ? <p className="phase7-suggestion" role="status">From the words you used, you may be describing yourself as <strong>{getMoodLabel(suggestedMood)}</strong>. Please confirm or choose another option.</p> : <p className="phase7-suggestion muted">We only suggest a mood when your words explicitly describe one. Your choice below is the value that gets saved.</p>}
       </section>

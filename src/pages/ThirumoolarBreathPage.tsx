@@ -76,8 +76,6 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
     try {
       if (audioContext.state !== 'running') await audioContext.resume()
 
-      // Prime Web Audio directly from the user's Start tap. iOS Safari and
-      // installed PWAs can otherwise keep later timer-triggered audio muted.
       const source = audioContext.createBufferSource()
       const gain = audioContext.createGain()
       source.buffer = audioContext.createBuffer(1, 1, audioContext.sampleRate)
@@ -156,7 +154,6 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
   async function startSession() {
     if (runningRef.current) return
 
-    // This must happen inside the Start button gesture for reliable iOS/PWA audio.
     await unlockAudio()
 
     const base = clampBase(baseUnit)
@@ -243,8 +240,8 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
   return (
     <main className="legacy-breath-page">
       <div className="legacy-breath-app">
-        <button className="legacy-breath-back" type="button" onClick={goBack} aria-label="Back to ShareCapsule Health">
-          ← Health
+        <button className="legacy-breath-back" type="button" onClick={goBack} aria-label="Back to Vital">
+          ← Vital
         </button>
 
         <section className="legacy-breath-card" aria-label="Thirumoolar Pranayama breathing guide">
