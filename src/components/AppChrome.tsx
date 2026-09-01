@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { APP_NAME } from '../brand'
 import { ConnectivityBanner } from './ConnectivityBanner'
 import { PwaUpdateNotice } from './PwaUpdateNotice'
 import { ReminderMonitor } from './ReminderMonitor'
@@ -25,7 +26,7 @@ export function AppChrome({ active, onNavigate, children }: AppChromeProps) {
       <PwaUpdateNotice />
       <ReminderMonitor />
       {children}
-      <nav className="phase3-bottom-nav" aria-label="ShareCapsule Health navigation">
+      <nav className="phase3-bottom-nav" aria-label={`${APP_NAME} navigation`}>
         {items.map((item) => (
           <button
             key={item.id}

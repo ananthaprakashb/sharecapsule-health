@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { APP_NAME } from '../brand'
 
 export function PwaUpdateNotice() {
   const [available, setAvailable] = useState(false)
@@ -25,7 +26,7 @@ export function PwaUpdateNotice() {
 
   return (
     <div className="pwa-update-notice" role="status">
-      <span>A new ShareCapsule Health version is ready.</span>
+      <span>A new {APP_NAME} version is ready.</span>
       <button type="button" onClick={updateApp}>Update</button>
     </div>
   )

@@ -243,8 +243,8 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
   return (
     <main className="legacy-breath-page">
       <div className="legacy-breath-app">
-        <button className="legacy-breath-back" type="button" onClick={goBack} aria-label="Back to ShareCapsule Health">
-          ← Health
+        <button className="legacy-breath-back" type="button" onClick={goBack} aria-label="Back to Vital">
+          ← Vital
         </button>
 
         <section className="legacy-breath-card" aria-label="Thirumoolar Pranayama breathing guide">
