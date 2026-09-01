@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { coreActivities } from '../activities/library'
 import { ActivityCard } from '../components/ActivityCard'
+import { PwaInstallCard } from '../components/PwaInstallCard'
 import { readFavorites, toggleFavorite } from '../storage/preferences'
-import { getTodaySummary } from '../storage/progress'
+import { getProgressSummary, getTodaySummary } from '../storage/progress'
 import type { HealthActivity } from '../types/activity'
 
 type HomePageProps = {
@@ -13,6 +14,7 @@ type HomePageProps = {
 
 export function HomePage({ onOpenActivity, onOpenRoutines, onOpenProgress }: HomePageProps) {
   const summary = getTodaySummary()
+  const progress = getProgressSummary()
   const [favorites, setFavorites] = useState(readFavorites)
   const favoriteActivities = coreActivities.filter((activity) => favorites.includes(activity.id))
 
@@ -33,7 +35,7 @@ export function HomePage({ onOpenActivity, onOpenRoutines, onOpenProgress }: Hom
   }
 
   return (
-    <main className="page-shell">
+    <main className="page-shell phase3-home">
       <header className="app-header">
         <div>
           <p className="eyebrow">ShareCapsule</p>
@@ -49,13 +51,17 @@ export function HomePage({ onOpenActivity, onOpenRoutines, onOpenProgress }: Hom
         <div className="today-stats" aria-label="Today's progress">
           <div><strong>{summary.activities}</strong><span>activities</span></div>
           <div><strong>{summary.minutes}</strong><span>minutes</span></div>
-          <div><strong>Local</strong><span>private progress</span></div>
+          <div><strong>{progress.streak}</strong><span>day streak</span></div>
         </div>
         <div className="hero-actions">
           <button type="button" onClick={onOpenRoutines}>Start a routine</button>
           <button type="button" onClick={onOpenProgress}>View progress</button>
         </div>
       </section>
+
+      <div className="phase3-install-slot">
+        <PwaInstallCard />
+      </div>
 
       {favoriteActivities.length ? (
         <section className="section-block">
@@ -79,12 +85,6 @@ export function HomePage({ onOpenActivity, onOpenRoutines, onOpenProgress }: Hom
         </div>
         <div className="activity-list">{coreActivities.map(renderActivity)}</div>
       </section>
-
-      <nav className="home-nav" aria-label="Health app navigation">
-        <button type="button" aria-current="page"><span>⌂</span>Today</button>
-        <button type="button" onClick={onOpenRoutines}><span>☷</span>Routines</button>
-        <button type="button" onClick={onOpenProgress}><span>◔</span>Progress</button>
-      </nav>
 
       <footer className="app-footer">Wellness guidance, not medical treatment.</footer>
     </main>

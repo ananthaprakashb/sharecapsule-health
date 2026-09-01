@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import { getActivityById, getActivityBySlug } from './activities/library'
+import { AppChrome } from './components/AppChrome'
+import type { AppSection } from './components/AppChrome'
 import { HomePage } from './pages/HomePage'
 import { ProgressPage } from './pages/ProgressPage'
 import { RoutinesPage } from './pages/RoutinesPage'
+import { SettingsPage } from './pages/SettingsPage'
 import { ThirumoolarBreathPage } from './pages/ThirumoolarBreathPage'
 import { TimedActivityPage } from './pages/TimedActivityPage'
 import type { HealthActivity } from './types/activity'
 
 type Route =
-  | { page: 'home' }
-  | { page: 'routines' }
-  | { page: 'progress' }
+  | { page: AppSection }
   | { page: 'activity'; slug: string }
 
 type ActiveRoutine = {
@@ -23,6 +24,7 @@ function routeFromHash(): Route {
   const hash = window.location.hash.replace(/^#\/?/, '')
   if (hash === 'routines') return { page: 'routines' }
   if (hash === 'progress') return { page: 'progress' }
+  if (hash === 'settings') return { page: 'settings' }
   if (hash.startsWith('activity/')) return { page: 'activity', slug: hash.slice('activity/'.length) }
   if (hash === 'breathe/thirumoolar') return { page: 'activity', slug: 'thirumoolar' }
   return { page: 'home' }
@@ -42,8 +44,13 @@ export default function App() {
     if (next.page === 'home') window.location.hash = '/'
     if (next.page === 'routines') window.location.hash = '/routines'
     if (next.page === 'progress') window.location.hash = '/progress'
+    if (next.page === 'settings') window.location.hash = '/settings'
     if (next.page === 'activity') window.location.hash = `/activity/${next.slug}`
     setRoute(next)
+  }
+
+  function navigateSection(page: AppSection) {
+    navigate({ page })
   }
 
   function openActivity(activity: HealthActivity) {
@@ -87,17 +94,41 @@ export default function App() {
   }
 
   if (route.page === 'routines') {
-    return <RoutinesPage onBack={() => navigate({ page: 'home' })} onStartRoutine={startRoutine} />
+    return (
+      <AppChrome active="routines" onNavigate={navigateSection}>
+        <RoutinesPage onBack={() => navigate({ page: 'home' })} onStartRoutine={startRoutine} />
+      </AppChrome>
+    )
   }
 
   if (route.page === 'progress') {
-    return <ProgressPage onBack={() => navigate({ page: 'home' })} />
+    return (
+      <AppChrome active="progress" onNavigate={navigateSection}>
+        <ProgressPage onBack={() => navigate({ page: 'home' })} />
+      </AppChrome>
+    )
+  }
+
+  if (route.page === 'settings') {
+    return (
+      <AppChrome active="settings" onNavigate={navigateSection}>
+        <SettingsPage onBack={() => navigate({ page: 'home' })} />
+      </AppChrome>
+    )
   }
 
   if (route.page === 'activity') {
     const activity = getActivityBySlug(route.slug)
     if (!activity) {
-      return <HomePage onOpenActivity={openActivity} onOpenRoutines={() => navigate({ page: 'routines' })} onOpenProgress={() => navigate({ page: 'progress' })} />
+      return (
+        <AppChrome active="home" onNavigate={navigateSection}>
+          <HomePage
+            onOpenActivity={openActivity}
+            onOpenRoutines={() => navigate({ page: 'routines' })}
+            onOpenProgress={() => navigate({ page: 'progress' })}
+          />
+        </AppChrome>
+      )
     }
 
     if (activity.slug === 'thirumoolar') {
@@ -109,6 +140,7 @@ export default function App() {
 
     return (
       <TimedActivityPage
+        key={activity.id}
         activity={activity}
         onBack={cancelActivity}
         onDone={finishTimedActivity}
@@ -119,10 +151,12 @@ export default function App() {
   }
 
   return (
-    <HomePage
-      onOpenActivity={openActivity}
-      onOpenRoutines={() => navigate({ page: 'routines' })}
-      onOpenProgress={() => navigate({ page: 'progress' })}
-    />
+    <AppChrome active="home" onNavigate={navigateSection}>
+      <HomePage
+        onOpenActivity={openActivity}
+        onOpenRoutines={() => navigate({ page: 'routines' })}
+        onOpenProgress={() => navigate({ page: 'progress' })}
+      />
+    </AppChrome>
   )
 }
