@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { coreActivities } from '../activities/library'
 import { ActivityCard } from '../components/ActivityCard'
 import { PwaInstallCard } from '../components/PwaInstallCard'
+import { readGoals } from '../storage/engagement'
 import { readFavorites, toggleFavorite } from '../storage/preferences'
 import { getProgressSummary, getTodaySummary } from '../storage/progress'
 import type { HealthActivity } from '../types/activity'
@@ -15,8 +16,12 @@ type HomePageProps = {
 export function HomePage({ onOpenActivity, onOpenRoutines, onOpenProgress }: HomePageProps) {
   const summary = getTodaySummary()
   const progress = getProgressSummary()
+  const goals = readGoals()
   const [favorites, setFavorites] = useState(readFavorites)
   const favoriteActivities = coreActivities.filter((activity) => favorites.includes(activity.id))
+  const minutesProgress = Math.min(100, Math.round((summary.minutes / goals.minutes) * 100))
+  const activitiesProgress = Math.min(100, Math.round((summary.activities / goals.activities) * 100))
+  const goalsMet = summary.minutes >= goals.minutes && summary.activities >= goals.activities
 
   function changeFavorite(activityId: string) {
     setFavorites(toggleFavorite(activityId))
@@ -46,7 +51,7 @@ export function HomePage({ onOpenActivity, onOpenRoutines, onOpenProgress }: Hom
 
       <section className="hero-card">
         <p className="eyebrow">Today</p>
-        <h2>Take a few minutes for yourself.</h2>
+        <h2>{goalsMet ? 'Daily goals complete.' : 'Take a few minutes for yourself.'}</h2>
         <p>Small, guided wellness activities that fit naturally into your day.</p>
         <div className="today-stats" aria-label="Today's progress">
           <div><strong>{summary.activities}</strong><span>activities</span></div>
@@ -59,28 +64,29 @@ export function HomePage({ onOpenActivity, onOpenRoutines, onOpenProgress }: Hom
         </div>
       </section>
 
-      <div className="phase3-install-slot">
-        <PwaInstallCard />
-      </div>
+      <section className="phase4-goal-card" aria-label="Daily goals">
+        <div className="phase4-goal-heading">
+          <div><p className="eyebrow">Daily goals</p><h2>{goalsMet ? 'Nice work today' : 'Keep your rhythm'}</h2></div>
+          <span>{goalsMet ? '✓' : '🎯'}</span>
+        </div>
+        <div className="phase4-goal-row">
+          <div><strong>{summary.minutes} / {goals.minutes} min</strong><span><i style={{ width: `${minutesProgress}%` }} /></span></div>
+          <div><strong>{summary.activities} / {goals.activities} activities</strong><span><i style={{ width: `${activitiesProgress}%` }} /></span></div>
+        </div>
+      </section>
+
+      <div className="phase3-install-slot"><PwaInstallCard /></div>
 
       {favoriteActivities.length ? (
         <section className="section-block">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Favorites</p>
-              <h2>Your quick starts</h2>
-            </div>
-          </div>
+          <div className="section-heading"><div><p className="eyebrow">Favorites</p><h2>Your quick starts</h2></div></div>
           <div className="activity-list">{favoriteActivities.map(renderActivity)}</div>
         </section>
       ) : null}
 
       <section className="section-block">
         <div className="section-heading">
-          <div>
-            <p className="eyebrow">Activity library</p>
-            <h2>Choose what you need</h2>
-          </div>
+          <div><p className="eyebrow">Activity library</p><h2>Choose what you need</h2></div>
           <span className="library-count">{coreActivities.length} activities</span>
         </div>
         <div className="activity-list">{coreActivities.map(renderActivity)}</div>

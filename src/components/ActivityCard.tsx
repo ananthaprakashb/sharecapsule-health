@@ -1,3 +1,4 @@
+import { getConfiguredDuration } from '../storage/engagement'
 import type { HealthActivity } from '../types/activity'
 
 type ActivityCardProps = {
@@ -13,6 +14,8 @@ export function ActivityCard({
   isFavorite = false,
   onToggleFavorite,
 }: ActivityCardProps) {
+  const duration = getConfiguredDuration(activity)
+
   return (
     <div className="activity-row">
       <button className="activity-card" onClick={onOpen} type="button">
@@ -21,7 +24,7 @@ export function ActivityCard({
           <strong>{activity.title}</strong>
           <span>{activity.subtitle}</span>
         </span>
-        <span className="activity-duration">{activity.durationMinutes} min</span>
+        <span className="activity-duration">{duration} min</span>
       </button>
       {onToggleFavorite ? (
         <button
