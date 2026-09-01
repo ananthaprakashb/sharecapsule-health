@@ -179,7 +179,7 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
     if (elapsed < 5) return
 
     recordCompletion({
-      activityId: 'thirumoolar-1-4-2',
+      activityId: 'thirumoolar-breath',
       completedAt: new Date().toISOString(),
       durationSeconds: elapsed,
       cycles: currentCycle,
