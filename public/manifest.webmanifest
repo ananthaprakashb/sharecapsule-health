@@ -1,17 +1,38 @@
 {
+  "id": "/",
   "name": "ShareCapsule Health",
   "short_name": "SC Health",
   "description": "Guided wellness activities for breathing, movement, mindfulness and daily routines.",
+  "lang": "en",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f5f2e8",
   "theme_color": "#12392f",
+  "categories": ["health", "lifestyle"],
   "icons": [
     {
       "src": "/app-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Thirumoolar Breath",
+      "short_name": "Breathe",
+      "url": "/#/activity/thirumoolar"
+    },
+    {
+      "name": "Routines",
+      "short_name": "Routines",
+      "url": "/#/routines"
+    },
+    {
+      "name": "Progress",
+      "short_name": "Progress",
+      "url": "/#/progress"
     }
   ]
 }
