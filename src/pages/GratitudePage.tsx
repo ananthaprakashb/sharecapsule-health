@@ -38,7 +38,7 @@ export function GratitudePage({ onBack }: GratitudePageProps) {
   const practiceStartedAtRef = useRef(Date.now())
   const tickerRef = useRef<number | null>(null)
   const maxTimerRef = useRef<number | null>(null)
-  const canRecord = Boolean(navigator.mediaDevices?.getUserMedia && 'MediaRecorder' in window)
+  const canRecord = Boolean(navigator.mediaDevices && 'MediaRecorder' in window)
 
   function clearTimers() {
     if (tickerRef.current !== null) window.clearInterval(tickerRef.current)
@@ -140,14 +140,7 @@ export function GratitudePage({ onBack }: GratitudePageProps) {
     if (done) return
     if (!audioBlob && !writtenNote.trim()) { setStatus('Record a voice message or write a note before completing this practice.'); return }
     const createdAt = new Date().toISOString()
-    recordGratitudeMoment({
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      createdAt,
-      recipient: recipient.trim() || undefined,
-      outcome,
-      mode: audioBlob ? 'voice' : 'written',
-      recordingSeconds: audioBlob ? recordedSeconds : undefined,
-    })
+    recordGratitudeMoment({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, createdAt, recipient: recipient.trim() || undefined, outcome, mode: audioBlob ? 'voice' : 'written', recordingSeconds: audioBlob ? recordedSeconds : undefined })
     const durationSeconds = Math.min(600, Math.max(1, Math.round((Date.now() - practiceStartedAtRef.current) / 1000)))
     recordCompletion({ activityId: gratitudeActivity.id, completedAt: createdAt, durationSeconds })
     setDone(true)
