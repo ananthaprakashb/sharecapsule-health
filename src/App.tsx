@@ -3,6 +3,7 @@ import { getActivityById, getActivityBySlug } from './activities/library'
 import { AppChrome } from './components/AppChrome'
 import type { AppSection } from './components/AppChrome'
 import { HomePage } from './pages/HomePage'
+import { PrivacyPage } from './pages/PrivacyPage'
 import { ProgressPage } from './pages/ProgressPage'
 import { RoutinesPage } from './pages/RoutinesPage'
 import { SettingsPage } from './pages/SettingsPage'
@@ -10,9 +11,8 @@ import { ThirumoolarBreathPage } from './pages/ThirumoolarBreathPage'
 import { TimedActivityPage } from './pages/TimedActivityPage'
 import type { HealthActivity } from './types/activity'
 
-type Route =
-  | { page: AppSection }
-  | { page: 'activity'; slug: string }
+type StaticPage = AppSection | 'privacy'
+type Route = { page: StaticPage } | { page: 'activity'; slug: string }
 
 type ActiveRoutine = {
   title: string
@@ -25,6 +25,7 @@ function routeFromHash(): Route {
   if (hash === 'routines') return { page: 'routines' }
   if (hash === 'progress') return { page: 'progress' }
   if (hash === 'settings') return { page: 'settings' }
+  if (hash === 'privacy') return { page: 'privacy' }
   if (hash.startsWith('activity/')) return { page: 'activity', slug: hash.slice('activity/'.length) }
   if (hash === 'breathe/thirumoolar') return { page: 'activity', slug: 'thirumoolar' }
   return { page: 'home' }
@@ -40,11 +41,21 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
+  useEffect(() => {
+    const pageTitle = route.page === 'activity'
+      ? getActivityBySlug(route.slug)?.title ?? 'Health activity'
+      : route.page === 'home'
+        ? 'ShareCapsule Health'
+        : `${route.page.charAt(0).toUpperCase()}${route.page.slice(1)} · ShareCapsule Health`
+    document.title = pageTitle
+  }, [route])
+
   function navigate(next: Route) {
     if (next.page === 'home') window.location.hash = '/'
     if (next.page === 'routines') window.location.hash = '/routines'
     if (next.page === 'progress') window.location.hash = '/progress'
     if (next.page === 'settings') window.location.hash = '/settings'
+    if (next.page === 'privacy') window.location.hash = '/privacy'
     if (next.page === 'activity') window.location.hash = `/activity/${next.slug}`
     setRoute(next)
   }
@@ -62,7 +73,6 @@ export default function App() {
     if (!activityIds.length) return
     const first = getActivityById(activityIds[0])
     if (!first) return
-
     setActiveRoutine({ title, activityIds, index: 0 })
     navigate({ page: 'activity', slug: first.slug })
   }
@@ -76,7 +86,6 @@ export default function App() {
     const nextIndex = activeRoutine.index + 1
     const nextId = activeRoutine.activityIds[nextIndex]
     const nextActivity = nextId ? getActivityById(nextId) : undefined
-
     if (!nextActivity) {
       setActiveRoutine(null)
       navigate({ page: 'routines' })
@@ -94,50 +103,31 @@ export default function App() {
   }
 
   if (route.page === 'routines') {
-    return (
-      <AppChrome active="routines" onNavigate={navigateSection}>
-        <RoutinesPage onBack={() => navigate({ page: 'home' })} onStartRoutine={startRoutine} />
-      </AppChrome>
-    )
+    return <AppChrome active="routines" onNavigate={navigateSection}><RoutinesPage onBack={() => navigate({ page: 'home' })} onStartRoutine={startRoutine} /></AppChrome>
   }
 
   if (route.page === 'progress') {
-    return (
-      <AppChrome active="progress" onNavigate={navigateSection}>
-        <ProgressPage onBack={() => navigate({ page: 'home' })} />
-      </AppChrome>
-    )
+    return <AppChrome active="progress" onNavigate={navigateSection}><ProgressPage onBack={() => navigate({ page: 'home' })} /></AppChrome>
   }
 
   if (route.page === 'settings') {
-    return (
-      <AppChrome active="settings" onNavigate={navigateSection}>
-        <SettingsPage onBack={() => navigate({ page: 'home' })} />
-      </AppChrome>
-    )
+    return <AppChrome active="settings" onNavigate={navigateSection}><SettingsPage onBack={() => navigate({ page: 'home' })} onOpenPrivacy={() => navigate({ page: 'privacy' })} /></AppChrome>
+  }
+
+  if (route.page === 'privacy') {
+    return <AppChrome active="settings" onNavigate={navigateSection}><PrivacyPage onBack={() => navigate({ page: 'settings' })} /></AppChrome>
   }
 
   if (route.page === 'activity') {
     const activity = getActivityBySlug(route.slug)
     if (!activity) {
-      return (
-        <AppChrome active="home" onNavigate={navigateSection}>
-          <HomePage
-            onOpenActivity={openActivity}
-            onOpenRoutines={() => navigate({ page: 'routines' })}
-            onOpenProgress={() => navigate({ page: 'progress' })}
-          />
-        </AppChrome>
-      )
+      return <AppChrome active="home" onNavigate={navigateSection}><HomePage onOpenActivity={openActivity} onOpenRoutines={() => navigate({ page: 'routines' })} onOpenProgress={() => navigate({ page: 'progress' })} /></AppChrome>
     }
 
-    if (activity.slug === 'thirumoolar') {
-      return <ThirumoolarBreathPage onBack={() => navigate({ page: 'home' })} />
-    }
+    if (activity.slug === 'thirumoolar') return <ThirumoolarBreathPage onBack={() => navigate({ page: 'home' })} />
 
     const nextId = activeRoutine?.activityIds[(activeRoutine?.index ?? 0) + 1]
     const nextActivity = nextId ? getActivityById(nextId) : undefined
-
     return (
       <TimedActivityPage
         key={activity.id}
@@ -150,13 +140,5 @@ export default function App() {
     )
   }
 
-  return (
-    <AppChrome active="home" onNavigate={navigateSection}>
-      <HomePage
-        onOpenActivity={openActivity}
-        onOpenRoutines={() => navigate({ page: 'routines' })}
-        onOpenProgress={() => navigate({ page: 'progress' })}
-      />
-    </AppChrome>
-  )
+  return <AppChrome active="home" onNavigate={navigateSection}><HomePage onOpenActivity={openActivity} onOpenRoutines={() => navigate({ page: 'routines' })} onOpenProgress={() => navigate({ page: 'progress' })} /></AppChrome>
 }

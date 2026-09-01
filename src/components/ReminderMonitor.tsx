@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { isScheduleDue, markScheduleNotified, readRoutineSchedules } from '../storage/engagement'
 import type { RoutineSchedule } from '../storage/engagement'
+import { readSettings } from '../storage/settings'
+import { playCue } from '../utils/cues'
 
-async function showSystemReminder(schedule: RoutineSchedule) {
+async function showSystemReminder(schedule: RoutineSchedule, silent = false) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return
 
   try {
@@ -12,6 +14,7 @@ async function showSystemReminder(schedule: RoutineSchedule) {
         body: 'Your scheduled ShareCapsule Health routine is ready.',
         icon: '/icon-192.png',
         tag: `routine-${schedule.id}`,
+        silent,
         data: { url: '/#/routines' },
       })
       return
@@ -21,9 +24,10 @@ async function showSystemReminder(schedule: RoutineSchedule) {
       body: 'Your scheduled ShareCapsule Health routine is ready.',
       icon: '/icon-192.png',
       tag: `routine-${schedule.id}`,
+      silent,
     })
   } catch {
-    // The in-app reminder below remains available when system notifications fail.
+    // The in-app reminder remains available when system notifications fail.
   }
 }
 
@@ -34,9 +38,14 @@ export function ReminderMonitor() {
     function check() {
       const schedule = readRoutineSchedules().find((item) => isScheduleDue(item))
       if (!schedule) return
+
       markScheduleNotified(schedule.id)
       setDue(schedule)
-      void showSystemReminder(schedule)
+
+      const settings = readSettings()
+      const playInAppChime = settings.reminderChime && !document.hidden
+      void showSystemReminder(schedule, playInAppChime)
+      if (playInAppChime) void playCue('reminder')
     }
 
     check()
