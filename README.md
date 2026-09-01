@@ -10,6 +10,8 @@ ShareCapsule Health is a mobile-first, local-first wellness PWA for guided breat
 - configurable activity durations
 - daily goals, streaks and achievement badges
 - local routine schedules and browser notifications
+- privacy-filtered progress sharing to a user-selected AI/app
+- versioned `sharecapsule.health.progress.v1` JSON contract for future connectors
 - installable/offline-capable PWA with controlled updates
 - local data export, restore and reset controls
 - no account required for the PWA experience
@@ -37,9 +39,16 @@ The PWA uses hash routing so static hosts do not require SPA rewrite rules.
 - `#/` — Today
 - `#/routines` — routines and local schedules
 - `#/progress` — progress and achievements
+- `#/ai-sharing` — configure and share progress with a preferred AI/app
 - `#/settings` — settings, install and local-data controls
 - `#/privacy` — PWA privacy and data-use notice
 - `#/activity/thirumoolar` — Thirumoolar Breath
+
+## AI / assistant sharing
+
+Progress sharing is provider-neutral and explicitly user initiated. Users select a preferred destination such as ChatGPT, Gemini, Claude, Copilot or another app, choose which progress fields to include, preview the generated update, and then use the operating system share sheet or copy text/JSON. The PWA does not store third-party AI API keys and does not automatically upload wellness history.
+
+The structured export uses `sharecapsule.health.progress.v1`. Future authenticated MCP/API integrations should consume the same user-approved contract so direct AI connectors do not require a different health-data model.
 
 ## Deployment requirements
 
@@ -55,7 +64,7 @@ PWA routine schedules are checked while the app is active and when it is reopene
 
 ## Privacy
 
-The current PWA stores goals, favorites, routines, schedules, settings and activity history in browser local storage. It does not currently collect HealthKit, Health Connect or verified step data. Users can export, restore or clear ShareCapsule Health local data from Settings.
+The current PWA stores goals, favorites, routines, schedules, settings, AI-sharing preferences and activity history in browser local storage. It does not currently collect HealthKit, Health Connect or verified step data. Users can export, restore or clear ShareCapsule Health local data from Settings. AI/app sharing occurs only when the user explicitly shares, copies or downloads a selected progress summary.
 
 ## Safety
 
