@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sharecapsule-health-v9'
+const CACHE_NAME = 'sharecapsule-health-v10'
 const APP_SHELL = ['/', '/manifest.webmanifest', '/app-icon.svg', '/icon-192.png', '/icon-180.png']
 
 self.addEventListener('install', (event) => { event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))) })
