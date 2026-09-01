@@ -1,19 +1,36 @@
+import { useState } from 'react'
+import { coreActivities } from '../activities/library'
 import { ActivityCard } from '../components/ActivityCard'
-import { thirumoolarBreath } from '../activities/thirumoolar'
+import { readFavorites, toggleFavorite } from '../storage/preferences'
 import { getTodaySummary } from '../storage/progress'
+import type { HealthActivity } from '../types/activity'
 
 type HomePageProps = {
-  onOpenThirumoolar: () => void
+  onOpenActivity: (activity: HealthActivity) => void
+  onOpenRoutines: () => void
+  onOpenProgress: () => void
 }
 
-const upcoming = [
-  { icon: '🧘', title: 'Meditate', detail: 'Guided relaxation', status: 'Coming next' },
-  { icon: '🤸', title: 'Stretch', detail: 'Gentle mobility break', status: 'Coming next' },
-  { icon: '🚶', title: 'Walk', detail: 'Mindful walking timer', status: 'Coming next' },
-]
-
-export function HomePage({ onOpenThirumoolar }: HomePageProps) {
+export function HomePage({ onOpenActivity, onOpenRoutines, onOpenProgress }: HomePageProps) {
   const summary = getTodaySummary()
+  const [favorites, setFavorites] = useState(readFavorites)
+  const favoriteActivities = coreActivities.filter((activity) => favorites.includes(activity.id))
+
+  function changeFavorite(activityId: string) {
+    setFavorites(toggleFavorite(activityId))
+  }
+
+  function renderActivity(activity: HealthActivity) {
+    return (
+      <ActivityCard
+        key={activity.id}
+        activity={activity}
+        onOpen={() => onOpenActivity(activity)}
+        isFavorite={favorites.includes(activity.id)}
+        onToggleFavorite={() => changeFavorite(activity.id)}
+      />
+    )
+  }
 
   return (
     <main className="page-shell">
@@ -34,36 +51,40 @@ export function HomePage({ onOpenThirumoolar }: HomePageProps) {
           <div><strong>{summary.minutes}</strong><span>minutes</span></div>
           <div><strong>Local</strong><span>private progress</span></div>
         </div>
+        <div className="hero-actions">
+          <button type="button" onClick={onOpenRoutines}>Start a routine</button>
+          <button type="button" onClick={onOpenProgress}>View progress</button>
+        </div>
       </section>
+
+      {favoriteActivities.length ? (
+        <section className="section-block">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Favorites</p>
+              <h2>Your quick starts</h2>
+            </div>
+          </div>
+          <div className="activity-list">{favoriteActivities.map(renderActivity)}</div>
+        </section>
+      ) : null}
 
       <section className="section-block">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Start now</p>
-            <h2>Breathing</h2>
+            <p className="eyebrow">Activity library</p>
+            <h2>Choose what you need</h2>
           </div>
+          <span className="library-count">{coreActivities.length} activities</span>
         </div>
-        <ActivityCard activity={thirumoolarBreath} onOpen={onOpenThirumoolar} />
+        <div className="activity-list">{coreActivities.map(renderActivity)}</div>
       </section>
 
-      <section className="section-block">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Growing library</p>
-            <h2>More ways to reset</h2>
-          </div>
-        </div>
-        <div className="coming-grid">
-          {upcoming.map((item) => (
-            <article className="coming-card" key={item.title}>
-              <span className="coming-icon" aria-hidden="true">{item.icon}</span>
-              <strong>{item.title}</strong>
-              <span>{item.detail}</span>
-              <small>{item.status}</small>
-            </article>
-          ))}
-        </div>
-      </section>
+      <nav className="home-nav" aria-label="Health app navigation">
+        <button type="button" aria-current="page"><span>⌂</span>Today</button>
+        <button type="button" onClick={onOpenRoutines}><span>☷</span>Routines</button>
+        <button type="button" onClick={onOpenProgress}><span>◔</span>Progress</button>
+      </nav>
 
       <footer className="app-footer">Wellness guidance, not medical treatment.</footer>
     </main>
