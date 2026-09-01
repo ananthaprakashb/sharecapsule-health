@@ -8,6 +8,7 @@ export type AiSharePreferences = {
   includeStreaks: boolean
   includeDailyBreakdown: boolean
   includeRecentActivities: boolean
+  includeCheckins: boolean
   includeExactTimes: boolean
 }
 
@@ -28,6 +29,7 @@ export const DEFAULT_AI_SHARE_PREFERENCES: AiSharePreferences = {
   includeStreaks: true,
   includeDailyBreakdown: true,
   includeRecentActivities: true,
+  includeCheckins: false,
   includeExactTimes: false,
 }
 
@@ -36,14 +38,9 @@ export function readAiSharePreferences(): AiSharePreferences {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return DEFAULT_AI_SHARE_PREFERENCES
     const parsed = JSON.parse(raw) as Partial<AiSharePreferences>
-    const destination = AI_DESTINATIONS.some((item) => item.id === parsed.preferredDestination)
-      ? parsed.preferredDestination as AiDestination
-      : DEFAULT_AI_SHARE_PREFERENCES.preferredDestination
+    const destination = AI_DESTINATIONS.some((item) => item.id === parsed.preferredDestination) ? parsed.preferredDestination as AiDestination : DEFAULT_AI_SHARE_PREFERENCES.preferredDestination
     const periods: ProgressPeriod[] = ['today', '7days', '30days', 'all']
-    const period = periods.includes(parsed.period as ProgressPeriod)
-      ? parsed.period as ProgressPeriod
-      : DEFAULT_AI_SHARE_PREFERENCES.period
-
+    const period = periods.includes(parsed.period as ProgressPeriod) ? parsed.period as ProgressPeriod : DEFAULT_AI_SHARE_PREFERENCES.period
     return {
       preferredDestination: destination,
       period,
@@ -51,6 +48,7 @@ export function readAiSharePreferences(): AiSharePreferences {
       includeStreaks: typeof parsed.includeStreaks === 'boolean' ? parsed.includeStreaks : true,
       includeDailyBreakdown: typeof parsed.includeDailyBreakdown === 'boolean' ? parsed.includeDailyBreakdown : true,
       includeRecentActivities: typeof parsed.includeRecentActivities === 'boolean' ? parsed.includeRecentActivities : true,
+      includeCheckins: typeof parsed.includeCheckins === 'boolean' ? parsed.includeCheckins : false,
       includeExactTimes: typeof parsed.includeExactTimes === 'boolean' ? parsed.includeExactTimes : false,
     }
   } catch {
@@ -58,7 +56,4 @@ export function readAiSharePreferences(): AiSharePreferences {
   }
 }
 
-export function saveAiSharePreferences(preferences: AiSharePreferences) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences))
-  return preferences
-}
+export function saveAiSharePreferences(preferences: AiSharePreferences) { localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences)); return preferences }
