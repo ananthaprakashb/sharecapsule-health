@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { gratitudeActivity } from '../activities/library'
 import { APP_NAME, APP_SHORT_NAME } from '../brand'
-import { recordGratitudeMoment } from '../storage/gratitude'
+import { getGratitudeSummary, recordGratitudeMoment } from '../storage/gratitude'
 import { recordCompletion } from '../storage/progress'
 
 type GratitudePageProps = { onBack: () => void }
@@ -90,6 +90,7 @@ export function GratitudePage({ onBack }: GratitudePageProps) {
   const streamRef = useRef<MediaStream | null>(null)
   const chunksRef = useRef<BlobPart[]>([])
   const audioUrlRef = useRef('')
+  const completionRecordedRef = useRef(false)
   const startedRecordingAtRef = useRef(0)
   const practiceStartedAtRef = useRef(Date.now())
   const tickerRef = useRef<number | null>(null)
@@ -228,23 +229,74 @@ export function GratitudePage({ onBack }: GratitudePageProps) {
     }
   }
 
+  function complete(outcome: 'shared' | 'private') {
+    if (completionRecordedRef.current || done) return false
+    if (!audioBlob && !writtenNote.trim()) {
+      setStatus('Record a voice message or write a note before completing this practice.')
+      return false
+    }
+
+    const createdAt = new Date().toISOString()
+    recordGratitudeMoment({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      createdAt,
+      recipient: recipient.trim() || undefined,
+      outcome,
+      mode: audioBlob ? 'voice' : 'written',
+      recordingSeconds: audioBlob ? recordedSeconds : undefined,
+    })
+    const durationSeconds = Math.min(600, Math.max(1, Math.round((Date.now() - practiceStartedAtRef.current) / 1000)))
+    recordCompletion({ activityId: gratitudeActivity.id, completedAt: createdAt, durationSeconds })
+
+    completionRecordedRef.current = true
+    setDone(true)
+    const summary = getGratitudeSummary()
+    const monthLabel = `${summary.thisMonth} gratitude moment${summary.thisMonth === 1 ? '' : 's'} this month.`
+    setStatus(outcome === 'shared'
+      ? `Thank-you shared and saved. ${monthLabel}`
+      : `Private gratitude moment saved. ${monthLabel}`)
+    return true
+  }
+
   async function shareMessage() {
     const name = recipient.trim() || 'someone'
     if (audioBlob) {
       const file = new File([audioBlob], `thank-you-${safeName(name)}-${new Date().toISOString().slice(0, 10)}.${extensionFor(audioBlob.type)}`, { type: audioBlob.type || 'audio/webm' })
       if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-        try { await navigator.share({ title: `A thank-you for ${name}`, text: `I recorded a short thank-you for you with ${APP_NAME}.`, files: [file] }); setStatus('Share sheet closed. If you sent it, mark this gratitude moment as shared below.'); return } catch (error) { if (error instanceof DOMException && error.name === 'AbortError') return }
+        try {
+          await navigator.share({ title: `A thank-you for ${name}`, text: `I recorded a short thank-you for you with ${APP_NAME}.`, files: [file] })
+          complete('shared')
+          return
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            setStatus('Share canceled. Nothing was added to your gratitude progress.')
+            return
+          }
+        }
       }
       downloadRecording()
-      setStatus('Your browser could not share the audio file directly, so it was downloaded. Attach it in your messaging app, then mark it as shared.')
+      setStatus('Your browser could not share the audio file directly, so it was downloaded. Attach it in your messaging app, then use Mark as shared below.')
       return
     }
+
     if (writtenNote.trim()) {
       const text = `${recipient.trim() ? `${recipient.trim()},\n\n` : ''}${writtenNote.trim()}`
-      if (navigator.share) { try { await navigator.share({ title: 'A thank-you', text }); setStatus('Share sheet closed. If you sent it, mark this gratitude moment as shared below.'); return } catch (error) { if (error instanceof DOMException && error.name === 'AbortError') return } }
-      setStatus('Sharing is not supported here. Copy your note into the messaging app you use.')
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'A thank-you', text })
+          complete('shared')
+          return
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            setStatus('Share canceled. Nothing was added to your gratitude progress.')
+            return
+          }
+        }
+      }
+      setStatus('Sharing is not supported here. Copy your note into the messaging app you use, then use Mark as shared below.')
       return
     }
+
     setStatus('Record a voice message or write a note first.')
   }
 
@@ -256,24 +308,13 @@ export function GratitudePage({ onBack }: GratitudePageProps) {
     link.click()
   }
 
-  function complete(outcome: 'shared' | 'private') {
-    if (done) return
-    if (!audioBlob && !writtenNote.trim()) { setStatus('Record a voice message or write a note before completing this practice.'); return }
-    const createdAt = new Date().toISOString()
-    recordGratitudeMoment({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, createdAt, recipient: recipient.trim() || undefined, outcome, mode: audioBlob ? 'voice' : 'written', recordingSeconds: audioBlob ? recordedSeconds : undefined })
-    const durationSeconds = Math.min(600, Math.max(1, Math.round((Date.now() - practiceStartedAtRef.current) / 1000)))
-    recordCompletion({ activityId: gratitudeActivity.id, completedAt: createdAt, durationSeconds })
-    setDone(true)
-    setStatus(outcome === 'shared' ? 'Gratitude moment saved as shared. Thank you for making the connection.' : 'Private gratitude moment saved on this device.')
-  }
-
   return (
     <main className="page-shell phase8-gratitude-page">
       <header className="subpage-header"><button className="icon-button" type="button" onClick={onBack} aria-label={`Back to ${APP_SHORT_NAME}`}>←</button><div><p className="eyebrow">Connection practice</p><h1>Thank someone</h1></div></header>
       <section className="phase8-intro-card"><span aria-hidden="true">💛</span><div><h2>Think of someone you do not see every day.</h2><p>Choose someone whose kindness, help, teaching or presence made a difference. A short, specific thank-you is enough.</p></div></section>
       <section className="settings-section"><p className="eyebrow">1 · Remember</p><h2>Who came to mind?</h2><label className="phase8-name-field"><span><strong>Name or nickname</strong><small>Optional. Stored only on this device if you complete the practice.</small></span><input value={recipient} onChange={(event) => setRecipient(event.target.value)} maxLength={80} placeholder="Someone you appreciate" /></label><div className="phase8-prompt"><strong>A simple message can have three parts:</strong><ol><li>What they did or what you remember.</li><li>Why it mattered to you.</li><li>What you want them to know now.</li></ol></div></section>
       <section className="settings-section"><p className="eyebrow">2 · Express</p><h2>Record your thank-you</h2><p className="settings-intro">About 20–90 seconds works well. {APP_NAME} does not save the raw recording to your history.</p>{!recorderSupport.supported ? <p className="phase6-status" role="status">{recorderSupport.reason}</p> : null}<div className={`phase8-recorder ${recording ? 'recording' : ''}`}><span className="phase8-mic" aria-hidden="true">{recording ? '●' : '🎙️'}</span><strong>{recording ? 'Recording…' : audioBlob ? 'Recording ready' : 'Ready when you are'}</strong><b>{Math.floor(recordedSeconds / 60)}:{String(recordedSeconds % 60).padStart(2, '0')}</b><div className="phase8-record-actions">{recording ? <button className="primary-button" type="button" onClick={stopRecording}>Stop recording</button> : <button className="primary-button" type="button" onClick={startRecording}>{audioBlob ? 'Record again' : 'Start voice message'}</button>}<button type="button" onClick={() => setWriting((value) => !value)}>Write instead</button></div></div>{audioUrl ? <audio className="phase8-audio" controls preload="metadata" src={audioUrl}>Your browser cannot play this recording.</audio> : null}{writing ? <label className="phase8-write"><span><strong>Written fallback</strong><small>Useful when microphone recording is unavailable.</small></span><textarea rows={5} maxLength={1200} value={writtenNote} onChange={(event) => setWrittenNote(event.target.value)} placeholder="Thank you for…" /></label> : null}{status ? <p className="phase6-status" role="status" aria-live="polite">{status}</p> : null}</section>
-      <section className="settings-section"><p className="eyebrow">3 · Connect</p><h2>Share it—or keep the reflection private</h2><p className="settings-intro">Sharing is optional. The device share sheet lets you choose Messages, WhatsApp, email or another compatible app without {APP_SHORT_NAME} reading your contacts.</p><div className="phase8-share-actions"><button className="primary-button" type="button" onClick={shareMessage} disabled={!audioBlob && !writtenNote.trim()}>Share thank-you</button>{audioBlob ? <button type="button" onClick={downloadRecording}>Download audio</button> : null}</div><div className="phase8-complete-actions"><button type="button" onClick={() => complete('shared')} disabled={done}>I shared/sent it</button><button type="button" onClick={() => complete('private')} disabled={done}>Keep this reflection private</button></div></section>
+      <section className="settings-section"><p className="eyebrow">3 · Connect</p><h2>Share it—or keep the reflection private</h2><p className="settings-intro">A successful Share thank-you action is saved automatically. For downloaded/manual sharing, use Mark as shared. You can also keep the reflection private.</p><div className="phase8-share-actions"><button className="primary-button" type="button" onClick={shareMessage} disabled={done || (!audioBlob && !writtenNote.trim())}>{done ? 'Gratitude saved' : 'Share thank-you'}</button>{audioBlob && !done ? <button type="button" onClick={downloadRecording}>Download audio</button> : null}</div><div className="phase8-complete-actions"><button type="button" onClick={() => complete('shared')} disabled={done}>Mark as shared</button><button type="button" onClick={() => complete('private')} disabled={done}>Keep this reflection private</button></div></section>
       <section className="settings-section settings-privacy"><p className="eyebrow">A gentle habit</p><h2>No gratitude streak pressure</h2><p>{APP_SHORT_NAME} tracks gratitude moments so you can notice the habit over time, but it does not rank or score who you thank. A sincere occasional message is more important than a number.</p></section>
     </main>
   )
