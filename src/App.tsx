@@ -3,11 +3,14 @@ import { getActivityById, getActivityBySlug } from './activities/library'
 import { APP_NAME } from './brand'
 import { AppChrome } from './components/AppChrome'
 import type { AppSection } from './components/AppChrome'
+import { ActiveRecallPage } from './pages/ActiveRecallPage'
 import { AiSharingPage } from './pages/AiSharingPage'
 import { GratitudePage } from './pages/GratitudePage'
 import { HomePage } from './pages/HomePage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { ProgressPage } from './pages/ProgressPage'
+import { ReadingPage } from './pages/ReadingPage'
+import { RestorePage } from './pages/RestorePage'
 import { RoutinesPage } from './pages/RoutinesPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { ThirumoolarBreathPage } from './pages/ThirumoolarBreathPage'
@@ -30,7 +33,7 @@ export default function App() {
   function navigateSection(page: AppSection) { navigate({ page }) }
   function openActivity(activity: HealthActivity) { setActiveRoutine(null); navigate({ page: 'activity', slug: activity.slug }) }
   function startRoutine(title: string, activityIds: string[]) { if (!activityIds.length) return; const first = getActivityById(activityIds[0]); if (!first) return; setActiveRoutine({ title, activityIds, index: 0 }); navigate({ page: 'activity', slug: first.slug }) }
-  function finishTimedActivity() { if (!activeRoutine) { navigate({ page: 'home' }); return }; const nextIndex = activeRoutine.index + 1; const nextId = activeRoutine.activityIds[nextIndex]; const nextActivity = nextId ? getActivityById(nextId) : undefined; if (!nextActivity) { setActiveRoutine(null); navigate({ page: 'routines' }); return }; setActiveRoutine({ ...activeRoutine, index: nextIndex }); navigate({ page: 'activity', slug: nextActivity.slug }) }
+  function finishActivity() { if (!activeRoutine) { navigate({ page: 'home' }); return }; const nextIndex = activeRoutine.index + 1; const nextId = activeRoutine.activityIds[nextIndex]; const nextActivity = nextId ? getActivityById(nextId) : undefined; if (!nextActivity) { setActiveRoutine(null); navigate({ page: 'routines' }); return }; setActiveRoutine({ ...activeRoutine, index: nextIndex }); navigate({ page: 'activity', slug: nextActivity.slug }) }
   function cancelActivity() { const wasRoutine = Boolean(activeRoutine); setActiveRoutine(null); navigate({ page: wasRoutine ? 'routines' : 'home' }) }
 
   if (route.page === 'routines') return <AppChrome active="routines" onNavigate={navigateSection}><RoutinesPage onBack={() => navigate({ page: 'home' })} onStartRoutine={startRoutine} /></AppChrome>
@@ -46,7 +49,11 @@ export default function App() {
     if (activity.slug === 'thirumoolar') return <ThirumoolarBreathPage onBack={() => navigate({ page: 'home' })} />
     const nextId = activeRoutine?.activityIds[(activeRoutine?.index ?? 0) + 1]
     const nextActivity = nextId ? getActivityById(nextId) : undefined
-    return <TimedActivityPage key={activity.id} activity={activity} onBack={cancelActivity} onDone={finishTimedActivity} routineLabel={activeRoutine?.title} nextLabel={activeRoutine ? (nextActivity ? `Next: ${nextActivity.title}` : 'Finish routine') : undefined} />
+    const nextLabel = activeRoutine ? (nextActivity ? `Next: ${nextActivity.title}` : 'Finish routine') : undefined
+    if (activity.slug === 'reading') return <AppChrome active="home" onNavigate={navigateSection}><ReadingPage onBack={cancelActivity} onDone={finishActivity} nextLabel={nextLabel} onStartRecall={() => { setActiveRoutine(null); navigate({ page: 'activity', slug: 'active-recall' }) }} /></AppChrome>
+    if (activity.slug === 'active-recall') return <AppChrome active="home" onNavigate={navigateSection}><ActiveRecallPage onBack={cancelActivity} onDone={finishActivity} nextLabel={nextLabel} /></AppChrome>
+    if (activity.slug === 'restore') return <AppChrome active="home" onNavigate={navigateSection}><RestorePage onBack={cancelActivity} onDone={finishActivity} nextLabel={nextLabel} /></AppChrome>
+    return <TimedActivityPage key={activity.id} activity={activity} onBack={cancelActivity} onDone={finishActivity} routineLabel={activeRoutine?.title} nextLabel={nextLabel} />
   }
   return <AppChrome active="home" onNavigate={navigateSection}><HomePage onOpenActivity={openActivity} onOpenRoutines={() => navigate({ page: 'routines' })} onOpenProgress={() => navigate({ page: 'progress' })} onOpenCheckin={() => navigate({ page: 'check-in' })} /></AppChrome>
 }
