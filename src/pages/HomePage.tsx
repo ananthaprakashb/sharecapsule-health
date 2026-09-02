@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { coreActivities, gratitudeActivity, readingActivity, restoreActivity, thirumoolarBreath, walkActivity } from '../activities/library'
+import { coreActivities, gratitudeActivity, readingActivity, restoreActivity, walkActivity } from '../activities/library'
+import { thirumoolarBreath } from '../activities/thirumoolar'
 import { APP_SHORT_NAME, APP_TAGLINE } from '../brand'
 import { ActivityCard } from '../components/ActivityCard'
 import { PwaInstallCard } from '../components/PwaInstallCard'
