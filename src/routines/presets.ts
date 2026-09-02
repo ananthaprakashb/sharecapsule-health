@@ -15,6 +15,13 @@ export const routinePresets: RoutinePreset[] = [
     activityIds: ['meditation-reset', 'gentle-stretch'],
   },
   {
+    id: 'learning-reset',
+    title: 'Learning Reset',
+    subtitle: 'Read intentionally, then retrieve it from memory',
+    icon: '🧠',
+    activityIds: ['intentional-reading', 'active-recall'],
+  },
+  {
     id: 'workday-reset',
     title: 'Workday Reset',
     subtitle: 'Step away from the screen and move',
@@ -23,9 +30,9 @@ export const routinePresets: RoutinePreset[] = [
   },
   {
     id: 'evening-unwind',
-    title: 'Evening Unwind',
-    subtitle: 'Slow down with movement and quiet time',
+    title: 'Evening Restore',
+    subtitle: 'Gentle movement followed by a wind-down or sleep check-in',
     icon: '🌙',
-    activityIds: ['gentle-stretch', 'meditation-reset'],
+    activityIds: ['gentle-stretch', 'restore-sleep'],
   },
 ]
