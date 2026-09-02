@@ -24,7 +24,8 @@ export function ReadingPage({ onBack, onDone, onStartRecall, nextLabel }: Readin
   const startedAtRef = useRef(0)
   const endsAtRef = useRef(0)
   const timerRef = useRef<number | null>(null)
-  const savedRef = useRef(false)
+  const completionSavedRef = useRef(false)
+  const reflectionSavedRef = useRef(false)
 
   function clearTimer() {
     if (timerRef.current !== null) window.clearInterval(timerRef.current)
@@ -32,18 +33,25 @@ export function ReadingPage({ onBack, onDone, onStartRecall, nextLabel }: Readin
   }
 
   function finishReading() {
-    if (savedRef.current) return
+    if (completionSavedRef.current) return
     const elapsed = startedAtRef.current ? Math.max(30, Math.round((Date.now() - startedAtRef.current) / 1000)) : minutes * 60
     clearTimer()
     setRunning(false)
     setSecondsLeft(0)
     setCompleted(true)
-    savedRef.current = true
-    const createdAt = new Date().toISOString()
-    recordCompletion({ activityId: readingActivity.id, completedAt: createdAt, durationSeconds: Math.min(minutes * 60, elapsed) })
-    if (topic.trim() || takeaway.trim()) saveLearningReflection({ id: `${Date.now()}-reading`, createdAt, kind: 'reading', topic: topic.trim() || undefined, keyIdea: takeaway.trim() || undefined })
+    completionSavedRef.current = true
+    recordCompletion({ activityId: readingActivity.id, completedAt: new Date().toISOString(), durationSeconds: Math.min(minutes * 60, elapsed) })
     setStatus('Reading moment saved. Before looking back, try recalling what you remember.')
   }
+
+  function saveReflection() {
+    if (reflectionSavedRef.current || (!topic.trim() && !takeaway.trim())) return
+    saveLearningReflection({ id: `${Date.now()}-reading`, createdAt: new Date().toISOString(), kind: 'reading', topic: topic.trim() || undefined, keyIdea: takeaway.trim() || undefined })
+    reflectionSavedRef.current = true
+  }
+
+  function continueToRecall() { saveReflection(); onStartRecall() }
+  function finishPage() { saveReflection(); onDone() }
 
   function startReading() {
     if (running || completed) return
@@ -73,6 +81,6 @@ export function ReadingPage({ onBack, onDone, onStartRecall, nextLabel }: Readin
       <label className="phase9-custom-duration"><span>Custom minutes</span><input type="number" min="1" max="60" value={minutes} disabled={running || completed} onChange={(event) => { const value = Math.max(1, Math.min(60, Number(event.target.value) || 1)); setMinutes(value); setSecondsLeft(value * 60) }} /></label>
     </section>
     <section className="settings-section phase9-timer-card"><p className="eyebrow">Reading block</p><div className="phase9-big-timer" aria-live="polite">{displayMinutes}:{displaySeconds}</div><p>Keep the source open while reading. When the timer ends, close it before recalling.</p>{!running && !completed ? <button className="primary-button" type="button" onClick={startReading}>Start reading</button> : null}{running ? <button className="primary-button" type="button" onClick={finishReading}>Finish reading</button> : null}</section>
-    {completed ? <section className="settings-section"><p className="eyebrow">One idea</p><h2>What is worth remembering?</h2><textarea className="phase9-textarea" rows={4} value={takeaway} onChange={(event) => setTakeaway(event.target.value)} maxLength={600} placeholder="Optional. Keep it short—the recall exercise comes next." /><p className="phase6-status" role="status">{status}</p><div className="phase9-actions">{nextLabel ? <button className="primary-button" type="button" onClick={onDone}>{nextLabel}</button> : <><button className="primary-button" type="button" onClick={onStartRecall}>Try Active Recall</button><button type="button" onClick={onDone}>Done for now</button></>}</div></section> : status ? <p className="phase6-status" role="status">{status}</p> : null}
+    {completed ? <section className="settings-section"><p className="eyebrow">One idea</p><h2>What is worth remembering?</h2><textarea className="phase9-textarea" rows={4} value={takeaway} onChange={(event) => setTakeaway(event.target.value)} maxLength={600} placeholder="Optional. Keep it short—the recall exercise comes next." /><p className="phase6-status" role="status">{status}</p><div className="phase9-actions">{nextLabel ? <button className="primary-button" type="button" onClick={finishPage}>{nextLabel}</button> : <><button className="primary-button" type="button" onClick={continueToRecall}>Try Active Recall</button><button type="button" onClick={finishPage}>Done for now</button></>}</div></section> : status ? <p className="phase6-status" role="status">{status}</p> : null}
   </main>
 }
