@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Vital by ShareCapsule",
   "short_name": "Vital",
-  "description": "Guided wellness activities for breathing, movement, mindfulness, voice check-ins, gratitude and daily routines.",
+  "description": "Guided wellness activities for breathing, movement, learning, sleep, reflection, gratitude and daily routines.",
   "lang": "en",
   "start_url": "/",
   "scope": "/",
@@ -10,7 +10,7 @@
   "orientation": "any",
   "background_color": "#f5f2e8",
   "theme_color": "#12392f",
-  "categories": ["health", "lifestyle"],
+  "categories": ["health", "lifestyle", "education"],
   "prefer_related_applications": false,
   "icons": [
     {
@@ -21,9 +21,15 @@
     },
     {
       "src": "/app-icon.svg",
-      "sizes": "any",
+      "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -31,6 +37,11 @@
       "name": "Thirumoolar Breath",
       "short_name": "Breathe",
       "url": "/#/activity/thirumoolar"
+    },
+    {
+      "name": "Intentional Reading",
+      "short_name": "Read",
+      "url": "/#/activity/reading"
     },
     {
       "name": "Routines",
