@@ -4,7 +4,10 @@ cleanupOutdatedCaches()
 precacheAndRoute(self.__WB_MANIFEST)
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim())
+  event.waitUntil(Promise.all([
+    self.clients.claim(),
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith('sharecapsule-health-')).map((key) => caches.delete(key)))),
+  ]))
 })
 
 self.addEventListener('message', (event) => {
