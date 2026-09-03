@@ -17,6 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_APP_BUILD: ${{ github.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,6 +36,13 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify PWA output
+        run: |
+          test -f dist/sw.js
+          test -f dist/manifest.webmanifest
+          grep -q "assets/" dist/sw.js
+          grep -q "512x512" dist/manifest.webmanifest
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
