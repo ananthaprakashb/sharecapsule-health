@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "@types/react": "latest",
-    "@types/react-dom": "latest"
+    "@types/react-dom": "latest",
+    "vite-plugin-pwa": "latest",
+    "workbox-precaching": "latest"
   }
 }
