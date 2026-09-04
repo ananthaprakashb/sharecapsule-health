@@ -1,6 +1,6 @@
 # Vital by ShareCapsule
 
-**Vital by ShareCapsule** is a mobile-first, local-first wellness PWA for guided breathing, meditation, stretching, walking, eye breaks, voice self-check-ins, gratitude expression and daily routines.
+**Vital by ShareCapsule** is a mobile-first, local-first wellness app for guided breathing, meditation, stretching, walking, eye breaks, intentional reading, Active Recall, sleep reflection, voice self-check-ins, gratitude expression and daily routines.
 
 **Tagline:** Small habits. Better well-being.
 
@@ -12,6 +12,8 @@ The GitHub repository name remains `sharecapsule-health` for continuity.
 
 - Thirumoolar Pranayama 1:4:2 experience with its original UI and phase chime
 - meditation, stretch, walking and eye-rest timers
+- intentional reading and Active Recall
+- restore/sleep self-reflection
 - voice wellness check-ins with user-confirmed mood labels
 - `Thank Someone` gratitude practice with short voice messages, playback and device sharing
 - gratitude history stores metadata only; raw gratitude audio is not persisted by the app
@@ -39,6 +41,31 @@ npm run typecheck
 npm run build
 ```
 
+## Android / Google Play
+
+Vital also supports a reproducible Android hybrid build using **Capacitor 8.5.1**. The Vite production bundle is packaged inside the Android application; the Play Store app is not a remote-site wrapper.
+
+Android identity:
+
+- application ID: `org.sharecapsule.vital`
+- first release: `1.0.0` (`versionCode` 1)
+- target SDK: API 36
+- minimum SDK: API 24
+
+Prepare and open the Android project:
+
+```bash
+npm install
+npm run android:prepare
+npm run android:open
+```
+
+The generated `android/` project is intentionally reproducible and ignored by Git. CI generates it, validates the Android manifest/SDK configuration, builds a debug APK and builds an unsigned release AAB. A signed AAB must be created with the private Play upload key before production submission.
+
+See [`mobile/PLAY_STORE.md`](mobile/PLAY_STORE.md) for the store listing, permissions, signing, Data Safety preparation and first-release checklist.
+
+The Android v1 local data store is separate from browser/PWA localStorage. Cross-device sync is not implied or enabled yet.
+
 ## Routes
 
 - `#/` — Today
@@ -47,7 +74,7 @@ npm run build
 - `#/check-in` — voice wellness check-in
 - `#/ai-sharing` — configure and share progress with a preferred AI/app
 - `#/settings` — settings, install and local-data controls
-- `#/privacy` — PWA privacy and data-use notice
+- `#/privacy` — privacy and data-use notice
 - `#/activity/thirumoolar` — Thirumoolar Breath
 - `#/activity/thank-someone` — gratitude voice-message practice
 
@@ -65,14 +92,15 @@ The public product name is `Vital by ShareCapsule`, while the progress contract 
 
 ## Deployment requirements
 
-- Serve the production build over HTTPS. Microphone features require a secure context.
-- The current manifest/service-worker paths assume deployment at the host root.
+- Serve the PWA production build over HTTPS. Microphone features require a secure context on the web.
+- The current manifest/service-worker paths assume PWA deployment at the host root.
 - Ensure `/sw.js`, `/manifest.webmanifest`, `/icon-192.png`, `/icon-180.png` and `/app-icon.svg` are served without authentication.
 - Validate microphone permission, recording/playback, file sharing, install, offline reopening, updates and notifications on the production origin.
+- Android builds bundle `dist/` locally through Capacitor and do not register the PWA service worker inside the native shell.
 
 ## Rebrand compatibility
 
-Existing users keep their data through the rename from ShareCapsule Health to Vital by ShareCapsule:
+Existing web users keep their data through the rename from ShareCapsule Health to Vital by ShareCapsule:
 
 - localStorage keys intentionally remain under the `sharecapsule-health:` prefix
 - service-worker cache prefixes remain unchanged
@@ -83,7 +111,7 @@ Do not rename those compatibility identifiers without a migration plan.
 
 ## Privacy
 
-The current PWA stores goals, favorites, routines, schedules, settings, AI-sharing preferences, activity history, confirmed check-ins and gratitude metadata in browser local storage. It does not currently collect HealthKit, Health Connect or verified step data. Raw gratitude audio is not persisted by Vital by ShareCapsule.
+Vital stores goals, favorites, routines, schedules, settings, AI-sharing preferences, activity history, learning/sleep reflections, confirmed check-ins and gratitude metadata locally on the current device. It does not currently collect HealthKit, Health Connect or verified step data. Raw gratitude audio is not persisted by Vital by ShareCapsule.
 
 ## Safety
 
