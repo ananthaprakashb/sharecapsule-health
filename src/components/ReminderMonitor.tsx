@@ -1,11 +1,13 @@
 import { APP_NAME } from '../brand'
 import { useEffect, useState } from 'react'
+import { isNativeApp } from '../platform/runtime'
 import { isScheduleDue, markScheduleNotified, readRoutineSchedules } from '../storage/engagement'
 import type { RoutineSchedule } from '../storage/engagement'
 import { readSettings } from '../storage/settings'
 import { playCue } from '../utils/cues'
 
 async function showSystemReminder(schedule: RoutineSchedule, silent = false) {
+  if (isNativeApp()) return
   if (!('Notification' in window) || Notification.permission !== 'granted') return
 
   try {

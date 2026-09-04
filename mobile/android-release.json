@@ -1,0 +1,7 @@
+{
+  "applicationId": "org.sharecapsule.vital",
+  "versionCode": 1,
+  "versionName": "1.0.0",
+  "targetSdk": 36,
+  "minSdk": 24
+}
