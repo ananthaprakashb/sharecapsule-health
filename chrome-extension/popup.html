@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thirumoolar 1:4:2</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="widget" aria-label="Thirumoolar 1:4:2 breathing widget">
+      <header class="widget-header">
+        <div class="brand-lockup">
+          <img src="icons/icon48.png" alt="" />
+          <div>
+            <h1>Thirumoolar</h1>
+            <p>1 : 4 : 2 breathing</p>
+          </div>
+        </div>
+        <a class="vital-link" href="https://health.sharecapsule.org/" target="_blank" rel="noreferrer">Vital ↗</a>
+      </header>
+
+      <section class="breath-card">
+        <div class="visual" aria-live="polite">
+          <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="track" cx="60" cy="60" r="54"></circle>
+            <circle id="progressRing" class="progress" cx="60" cy="60" r="54"></circle>
+          </svg>
+          <div id="orb" class="orb">
+            <strong id="phaseTamil">Ready</strong>
+            <span id="phaseEnglish">1 : 4 : 2</span>
+            <div id="timer" class="timer">--</div>
+            <small id="phaseDetail">Continuous loop</small>
+          </div>
+        </div>
+
+        <div class="phase-strip" aria-label="Breathing phases">
+          <div class="phase-pill" data-phase="0"><strong>பூரகம்</strong><span>Inhale · Left</span></div>
+          <div class="phase-pill" data-phase="1"><strong>கும்பகம்</strong><span>Hold</span></div>
+          <div class="phase-pill" data-phase="2"><strong>ரேசகம்</strong><span>Exhale · Right</span></div>
+        </div>
+
+        <div class="base-row">
+          <div>
+            <label for="baseUnit">Inhale base</label>
+            <small id="durations">4s · 16s · 8s</small>
+          </div>
+          <div class="stepper">
+            <button id="decrease" type="button" aria-label="Decrease inhale base">−</button>
+            <input id="baseUnit" type="number" min="2" max="16" inputmode="numeric" value="4" aria-label="Inhale base in seconds" />
+            <button id="increase" type="button" aria-label="Increase inhale base">+</button>
+          </div>
+        </div>
+
+        <div class="session-meta">
+          <span id="cycleLabel">Ready</span>
+          <span id="ratioLabel">Purakam · Kumbakam · Rechakam</span>
+        </div>
+
+        <div class="actions">
+          <button id="start" class="primary" type="button">Start</button>
+          <button id="stop" class="secondary" type="button" disabled>Stop</button>
+        </div>
+
+        <p class="safety">Practice comfortably. Never strain or force breath retention.</p>
+      </section>
+
+      <footer>
+        <span>Want routines and progress?</span>
+        <a href="https://health.sharecapsule.org/" target="_blank" rel="noreferrer">Open full Vital</a>
+      </footer>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
