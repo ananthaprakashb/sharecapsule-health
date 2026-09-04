@@ -1,20 +1,18 @@
 {
   "manifest_version": 3,
   "name": "Thirumoolar Pranayama Breathwork",
-  "version": "1.1.0",
-  "description": "Open Vital by ShareCapsule's current Thirumoolar 1:4:2 guided breathing experience.",
-  "homepage_url": "https://health.sharecapsule.org/#/activity/thirumoolar",
+  "version": "1.1.1",
+  "description": "A compact Thirumoolar 1:4:2 guided breathing widget with Tamil/English cues and phase chimes.",
+  "homepage_url": "https://health.sharecapsule.org/",
   "action": {
-    "default_title": "Open Thirumoolar Pranayama",
+    "default_title": "Thirumoolar 1:4:2",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
-  },
-  "background": {
-    "service_worker": "background.js"
   },
   "icons": {
     "16": "icons/icon16.png",
