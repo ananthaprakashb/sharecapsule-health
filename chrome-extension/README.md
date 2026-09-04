@@ -2,25 +2,21 @@
 
 This folder is the canonical source for the Chrome Web Store extension **Thirumoolar Pranayama Breathwork**.
 
-## Why the extension opens the Vital web experience
+## Compact widget design
 
-The original extension shipped its own standalone breathing UI. That created two implementations of the same practice: the extension and the Vital web app.
+The Chrome extension is intentionally a small, self-contained breathing widget. Clicking the toolbar icon opens a compact extension popup containing only the Thirumoolar 1:4:2 practice — it does **not** load the full Vital website.
 
-Version 1.1.0 removes that duplication. Clicking the extension action opens the production Vital route:
+The popup provides:
 
-`https://health.sharecapsule.org/#/activity/thirumoolar`
+- continuous Purakam → Kumbakam → Rechakam cycles at 1:4:2
+- Tamil + English phase guidance
+- adjustable inhale base unit from 2–16 seconds
+- animated breathing orb and phase-progress ring
+- 528 Hz chime at each phase transition
+- Start / Stop controls
+- a small **Open full Vital** link for users who want routines, progress and the broader wellness app
 
-This keeps the extension aligned with the current Vital experience automatically:
-
-- same Thirumoolar 1:4:2 timer and continuous cycles
-- same Tamil/English phase labels
-- same 528 Hz single chime behavior
-- same adjustable inhale base unit
-- same progress ring/orb UI
-- same safety and browser fixes delivered through the web app
-- same `health.sharecapsule.org` local progress history
-
-The extension requests no Chrome permissions and does not inject scripts into websites.
+The extension requests no Chrome permissions, injects no scripts into websites, and sends no breathing data to Vital. The inhale base preference is stored only in the extension's own local browser storage.
 
 ## Local test
 
@@ -29,11 +25,12 @@ The extension requests no Chrome permissions and does not inject scripts into we
 3. Choose **Load unpacked**.
 4. Select this `chrome-extension` folder.
 5. Click the extension icon.
-6. Confirm a focused Vital practice window opens directly on Thirumoolar Pranayama.
-7. Test Start, phase transitions, chime, base-unit controls and Stop.
+6. Confirm the compact breathing popup appears without opening the Vital site.
+7. Test Start, Stop, base-unit controls, Tamil/English phase transitions, progress animation and chime.
+8. Click **Open full Vital** and confirm it opens `https://health.sharecapsule.org/` in a normal browser tab.
 
 ## Chrome Web Store update
 
-Upload the packaged v1.1.0 ZIP as an update to the existing extension so the existing extension ID and users are retained. Do not create a second store listing.
+Upload the packaged v1.1.1 ZIP as an update to the existing extension so the existing extension ID and users are retained. Do not create a second store listing.
 
 See `STORE_UPDATE.md` for the release checklist.
