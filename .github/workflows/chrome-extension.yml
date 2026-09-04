@@ -1,0 +1,38 @@
+name: Package Chrome Extension
+
+on:
+  pull_request:
+    paths:
+      - 'chrome-extension/**'
+      - '.github/workflows/chrome-extension.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'chrome-extension/**'
+      - '.github/workflows/chrome-extension.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate manifest
+        run: node -e "const m=require('./chrome-extension/manifest.json'); if(m.manifest_version!==3) throw new Error('Manifest V3 required'); if(m.version!=='1.1.0') throw new Error('Expected extension version 1.1.0'); if(m.permissions?.length) throw new Error('This launcher extension should not request permissions')"
+
+      - name: Package extension
+        run: |
+          cd chrome-extension
+          zip -r ../thirumoolar-pranayama-extension-v1.1.0.zip manifest.json background.js icons
+
+      - name: Upload Chrome Web Store package
+        uses: actions/upload-artifact@v4
+        with:
+          name: thirumoolar-pranayama-extension-v1.1.0
+          path: thirumoolar-pranayama-extension-v1.1.0.zip
+          if-no-files-found: error
