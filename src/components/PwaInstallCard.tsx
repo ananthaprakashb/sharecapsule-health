@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { APP_NAME, APP_SHORT_NAME } from '../brand'
+import { isNativeApp } from '../platform/runtime'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -20,11 +21,14 @@ function isIosDevice() {
 }
 
 export function PwaInstallCard() {
+  const native = isNativeApp()
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [installed, setInstalled] = useState(isStandalone)
-  const ios = isIosDevice()
+  const [installed, setInstalled] = useState(() => native || isStandalone())
+  const ios = !native && isIosDevice()
 
   useEffect(() => {
+    if (native) return
+
     function onBeforeInstallPrompt(event: Event) {
       event.preventDefault()
       setInstallPrompt(event as BeforeInstallPromptEvent)
@@ -41,7 +45,7 @@ export function PwaInstallCard() {
       window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
       window.removeEventListener('appinstalled', onInstalled)
     }
-  }, [])
+  }, [native])
 
   async function install() {
     if (!installPrompt) return
@@ -50,6 +54,8 @@ export function PwaInstallCard() {
     if (choice.outcome === 'accepted') setInstalled(true)
     setInstallPrompt(null)
   }
+
+  if (native) return null
 
   if (installed) {
     return (
