@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
+import '../breath-share.css'
+import { shareThirumoolarPractice } from '../platform/share'
 import { recordCompletion } from '../storage/progress'
 
 type ThirumoolarBreathPageProps = {
@@ -33,6 +35,7 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
   const [phaseProgress, setPhaseProgress] = useState(0)
   const [currentCycle, setCurrentCycle] = useState(0)
   const [elapsed, setElapsed] = useState(0)
+  const [shareStatus, setShareStatus] = useState('')
 
   const audioContextRef = useRef<AudioContext | null>(null)
   const timerRef = useRef<number | null>(null)
@@ -204,6 +207,14 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
     onBack()
   }
 
+  async function sharePractice() {
+    setShareStatus('')
+    const result = await shareThirumoolarPractice()
+    if (result === 'copied') setShareStatus('Breathing practice link copied.')
+    if (result === 'shared') setShareStatus('Breathing practice shared.')
+    if (result === 'failed') setShareStatus('Unable to share. Please try again.')
+  }
+
   useEffect(() => {
     function restoreAudio() {
       if (!runningRef.current) return
@@ -246,6 +257,9 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
         <button className="legacy-breath-back" type="button" onClick={goBack} aria-label="Back to Vital">
           ← Vital
         </button>
+        <button className="legacy-breath-share" type="button" onClick={sharePractice} aria-label="Share Thirumoolar breathing practice">
+          <span aria-hidden="true">↗</span> Share
+        </button>
 
         <section className="legacy-breath-card" aria-label="Thirumoolar Pranayama breathing guide">
           <header className="legacy-breath-title">
@@ -256,6 +270,8 @@ export function ThirumoolarBreathPage({ onBack }: ThirumoolarBreathPageProps) {
               <span>Purakam</span><i></i><span>Kumbakam</span><i></i><span>Rechakam</span> · 1:4:2
             </div>
           </header>
+
+          {shareStatus ? <p className="legacy-breath-share-status" role="status">{shareStatus}</p> : null}
 
           <div className="legacy-breath-visual">
             <div className="legacy-breath-halo"></div>
